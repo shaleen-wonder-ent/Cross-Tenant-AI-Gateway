@@ -1,65 +1,62 @@
-<mxfile host="65bd71144e">
-    <diagram id="animated-call-flow" name="Animated Call Flow">
-        <mxGraphModel dx="810" dy="443" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1140" pageHeight="600" math="0" shadow="0">
-            <root>
-                <mxCell id="0"/>
-                <mxCell id="1" parent="0"/>
-                <mxCell id="title" parent="1" style="text;html=1;align=center;verticalAlign=middle;fontSize=15;fontStyle=1;fillColor=none;strokeColor=none;" value="Animated Call Flow - Live Request / Response / Metering Path" vertex="1">
-                    <mxGeometry height="28" width="1080" x="20" y="10" as="geometry"/>
-                </mxCell>
-                <mxCell id="subtitle" parent="1" style="text;html=1;align=center;verticalAlign=middle;fontSize=10;fontStyle=2;fontColor=#666666;fillColor=none;strokeColor=none;" value="Open this file in draw.io (desktop, app.diagrams.net, or the VS Code Draw.io Integration extension) to see the arrows pulse in the direction of travel" vertex="1">
-                    <mxGeometry height="20" width="1080" x="20" y="36" as="geometry"/>
-                </mxCell>
-                <mxCell id="platform_box" parent="1" style="rounded=1;whiteSpace=wrap;html=1;align=center;verticalAlign=middle;fontSize=11;fillColor=#dae8fc;strokeColor=#6c8ebf;" value="ISV Platform&lt;br&gt;(Customer Tenant)" vertex="1">
-                    <mxGeometry height="90" width="240" x="60" y="150" as="geometry"/>
-                </mxCell>
-                <mxCell id="gateway_box" parent="1" style="rounded=1;whiteSpace=wrap;html=1;align=center;verticalAlign=middle;fontSize=11;fillColor=#d5e8d4;strokeColor=#82b366;" value="Azure API Management&lt;br&gt;AI Gateway (Provider Tenant)" vertex="1">
-                    <mxGeometry height="90" width="240" x="440" y="150" as="geometry"/>
-                </mxCell>
-                <mxCell id="foundry_box" parent="1" style="rounded=1;whiteSpace=wrap;html=1;align=center;verticalAlign=middle;fontSize=11;fillColor=#ffffff;strokeColor=#82b366;" value="Microsoft Foundry&lt;br&gt;Claude deployment" vertex="1">
-                    <mxGeometry height="90" width="240" x="820" y="150" as="geometry"/>
-                </mxCell>
-                <mxCell id="anthropic_box" parent="1" style="rounded=1;whiteSpace=wrap;html=1;align=center;verticalAlign=middle;fontSize=11;fillColor=#ffe6cc;strokeColor=#d79b00;" value="Anthropic inference service" vertex="1">
-                    <mxGeometry height="90" width="240" x="820" y="330" as="geometry"/>
-                </mxCell>
-                <mxCell id="monitor_box" parent="1" style="rounded=1;whiteSpace=wrap;html=1;align=center;verticalAlign=middle;fontSize=11;fillColor=#e1d5e7;strokeColor=#9673a6;" value="Azure Monitor&lt;br&gt;token metrics / chargeback" vertex="1">
-                    <mxGeometry height="90" width="240" x="440" y="330" as="geometry"/>
-                </mxCell>
-                <mxCell id="req1" edge="1" parent="1" source="platform_box" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;endArrow=block;dashed=1;dashPattern=4 4;flowAnimation=1;strokeColor=#1a73e8;strokeWidth=2;fontSize=9;fontColor=#1a73e8;exitX=1;exitY=0.3;entryX=0;entryY=0.3;" target="gateway_box" value="1. Request + OAuth2 token / Subscription Key">
-                    <mxGeometry relative="1" x="-0.1429" y="37" as="geometry">
-                        <mxPoint as="offset"/>
-                    </mxGeometry>
-                </mxCell>
-                <mxCell id="req2" edge="1" parent="1" source="gateway_box" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;endArrow=block;dashed=1;dashPattern=4 4;flowAnimation=1;strokeColor=#1a73e8;strokeWidth=2;fontSize=9;fontColor=#1a73e8;exitX=1;exitY=0.3;entryX=0;entryY=0.3;" target="foundry_box" value="2. Forward with managed-identity token">
-                    <mxGeometry relative="1" y="37" as="geometry">
-                        <mxPoint as="offset"/>
-                    </mxGeometry>
-                </mxCell>
-                <mxCell id="req3" edge="1" parent="1" source="foundry_box" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;endArrow=block;dashed=1;dashPattern=4 4;flowAnimation=1;strokeColor=#1a73e8;strokeWidth=2;fontSize=9;fontColor=#1a73e8;exitX=0.5;exitY=1;entryX=0.5;entryY=0;" target="anthropic_box" value="3. Route to Claude">
-                    <mxGeometry relative="1" x="-0.1111" y="70" as="geometry">
-                        <mxPoint as="offset"/>
-                    </mxGeometry>
-                </mxCell>
-                <mxCell id="resp1" edge="1" parent="1" source="anthropic_box" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;endArrow=block;dashed=1;dashPattern=4 4;flowAnimation=1;strokeColor=#2d7d46;strokeWidth=2;fontSize=9;fontColor=#2d7d46;exitX=0.3;exitY=0;entryX=0.3;entryY=1;" target="foundry_box" value="4. Completion + usage">
-                    <mxGeometry relative="1" x="0.3333" y="52" as="geometry">
-                        <mxPoint as="offset"/>
-                    </mxGeometry>
-                </mxCell>
-                <mxCell id="resp2" edge="1" parent="1" source="foundry_box" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;endArrow=block;dashed=1;dashPattern=4 4;flowAnimation=1;strokeColor=#2d7d46;strokeWidth=2;fontSize=9;fontColor=#2d7d46;exitX=0;exitY=0.7;entryX=1;entryY=0.7;" target="gateway_box" value="5. Response">
-                    <mxGeometry relative="1" as="geometry"/>
-                </mxCell>
-                <mxCell id="resp3" edge="1" parent="1" source="gateway_box" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;endArrow=block;dashed=1;dashPattern=4 4;flowAnimation=1;strokeColor=#2d7d46;strokeWidth=2;fontSize=9;fontColor=#2d7d46;exitX=0;exitY=0.7;entryX=1;entryY=0.7;" target="platform_box" value="6. Response to caller">
-                    <mxGeometry relative="1" x="0.1429" y="17" as="geometry">
-                        <mxPoint as="offset"/>
-                    </mxGeometry>
-                </mxCell>
-                <mxCell id="metric1" edge="1" parent="1" source="gateway_box" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;endArrow=block;dashed=1;dashPattern=1 3;flowAnimation=1;strokeColor=#d79b00;strokeWidth=2;fontSize=9;fontColor=#d79b00;exitX=0.5;exitY=1;entryX=0.5;entryY=0;" target="monitor_box" value="7. Emit token metric (async, dimensioned by client)">
-                    <mxGeometry relative="1" as="geometry"/>
-                </mxCell>
-                <mxCell id="legend" parent="1" style="rounded=1;whiteSpace=wrap;html=1;align=left;verticalAlign=top;spacing=6;fontSize=10;fillColor=#f5f5f5;strokeColor=#666666;" value="Legend&lt;br&gt;• Blue pulsing arrows = outbound request path (customer tenant to provider tenant to Anthropic)&lt;br&gt;• Green pulsing arrows = response path back to the caller&lt;br&gt;• Orange dotted pulsing arrow = asynchronous token-metering / chargeback emission, does not block the response&lt;br&gt;• Identity note: step 1 uses OAuth2 client-credentials or a subscription key (no tenant restriction); step 2 uses the gateway&#39;s own managed identity, which is a same-tenant hop" vertex="1">
-                    <mxGeometry height="110" width="1000" x="60" y="460" as="geometry"/>
-                </mxCell>
-            </root>
-        </mxGraphModel>
-    </diagram>
+<mxfile host="app.diagrams.net">
+  <diagram id="animated-call-flow" name="Animated Call Flow">
+    <mxGraphModel dx="1507" dy="649" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1140" pageHeight="600" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="title" parent="1" style="text;html=1;align=center;verticalAlign=middle;fontSize=15;fontStyle=1;fillColor=none;strokeColor=none;" value="Animated Call Flow - Live Request / Response / Metering Path" vertex="1">
+          <mxGeometry height="28" width="1080" x="20" y="10" as="geometry" />
+        </mxCell>
+        <mxCell id="platform_box" parent="1" style="rounded=1;whiteSpace=wrap;html=1;align=center;verticalAlign=middle;fontSize=11;fillColor=#dae8fc;strokeColor=#6c8ebf;" value="ISV Platform&lt;br&gt;(Customer Tenant)" vertex="1">
+          <mxGeometry height="90" width="240" x="60" y="150" as="geometry" />
+        </mxCell>
+        <mxCell id="gateway_box" parent="1" style="rounded=1;whiteSpace=wrap;html=1;align=center;verticalAlign=middle;fontSize=11;fillColor=#d5e8d4;strokeColor=#82b366;" value="Azure API Management&lt;br&gt;AI Gateway (Provider Tenant)" vertex="1">
+          <mxGeometry height="90" width="240" x="440" y="150" as="geometry" />
+        </mxCell>
+        <mxCell id="foundry_box" parent="1" style="rounded=1;whiteSpace=wrap;html=1;align=center;verticalAlign=middle;fontSize=11;fillColor=#ffffff;strokeColor=#82b366;" value="Microsoft Foundry&lt;br&gt;Claude deployment" vertex="1">
+          <mxGeometry height="90" width="240" x="820" y="150" as="geometry" />
+        </mxCell>
+        <mxCell id="anthropic_box" parent="1" style="rounded=1;whiteSpace=wrap;html=1;align=center;verticalAlign=middle;fontSize=11;fillColor=#ffe6cc;strokeColor=#d79b00;" value="Anthropic inference service" vertex="1">
+          <mxGeometry height="90" width="240" x="820" y="330" as="geometry" />
+        </mxCell>
+        <mxCell id="monitor_box" parent="1" style="rounded=1;whiteSpace=wrap;html=1;align=center;verticalAlign=middle;fontSize=11;fillColor=#e1d5e7;strokeColor=#9673a6;" value="Azure Monitor&lt;br&gt;token metrics / chargeback" vertex="1">
+          <mxGeometry height="90" width="240" x="440" y="330" as="geometry" />
+        </mxCell>
+        <mxCell id="req1" edge="1" parent="1" source="platform_box" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;endArrow=block;dashed=1;dashPattern=4 4;flowAnimation=1;strokeColor=#1a73e8;strokeWidth=2;fontSize=9;fontColor=#1a73e8;exitX=1;exitY=0.3;entryX=0;entryY=0.3;" target="gateway_box" value="1. Request + OAuth2 token / Subscription Key">
+          <mxGeometry relative="1" x="-0.1429" y="37" as="geometry">
+            <mxPoint as="offset" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="req2" edge="1" parent="1" source="gateway_box" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;endArrow=block;dashed=1;dashPattern=4 4;flowAnimation=1;strokeColor=#1a73e8;strokeWidth=2;fontSize=9;fontColor=#1a73e8;exitX=1;exitY=0.3;entryX=0;entryY=0.3;" target="foundry_box" value="2. Forward with managed-identity token">
+          <mxGeometry relative="1" y="37" as="geometry">
+            <mxPoint as="offset" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="req3" edge="1" parent="1" source="foundry_box" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;endArrow=block;dashed=1;dashPattern=4 4;flowAnimation=1;strokeColor=#1a73e8;strokeWidth=2;fontSize=9;fontColor=#1a73e8;exitX=0.5;exitY=1;entryX=0.5;entryY=0;" target="anthropic_box" value="3. Route to Claude">
+          <mxGeometry relative="1" x="-0.1111" y="70" as="geometry">
+            <mxPoint as="offset" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="resp1" edge="1" parent="1" source="anthropic_box" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;endArrow=block;dashed=1;dashPattern=4 4;flowAnimation=1;strokeColor=#2d7d46;strokeWidth=2;fontSize=9;fontColor=#2d7d46;exitX=0.3;exitY=0;entryX=0.3;entryY=1;" target="foundry_box" value="4. Completion + usage">
+          <mxGeometry relative="1" x="0.3333" y="52" as="geometry">
+            <mxPoint as="offset" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="resp2" edge="1" parent="1" source="foundry_box" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;endArrow=block;dashed=1;dashPattern=4 4;flowAnimation=1;strokeColor=#2d7d46;strokeWidth=2;fontSize=9;fontColor=#2d7d46;exitX=0;exitY=0.7;entryX=1;entryY=0.7;" target="gateway_box" value="5. Response">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="resp3" edge="1" parent="1" source="gateway_box" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;endArrow=block;dashed=1;dashPattern=4 4;flowAnimation=1;strokeColor=#2d7d46;strokeWidth=2;fontSize=9;fontColor=#2d7d46;exitX=0;exitY=0.7;entryX=1;entryY=0.7;" target="platform_box" value="6. Response to caller">
+          <mxGeometry relative="1" x="0.1429" y="17" as="geometry">
+            <mxPoint as="offset" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="metric1" edge="1" parent="1" source="gateway_box" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;endArrow=block;dashed=1;dashPattern=1 3;flowAnimation=1;strokeColor=#d79b00;strokeWidth=2;fontSize=9;fontColor=#d79b00;exitX=0.5;exitY=1;entryX=0.5;entryY=0;" target="monitor_box" value="7. Emit token metric (async, dimensioned by client)">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="legend" parent="1" style="rounded=1;whiteSpace=wrap;html=1;align=left;verticalAlign=top;spacing=6;fontSize=10;fillColor=#f5f5f5;strokeColor=#666666;" value="Legend&lt;br&gt;• Blue pulsing arrows = outbound request path (customer tenant to provider tenant to Anthropic)&lt;br&gt;• Green pulsing arrows = response path back to the caller&lt;br&gt;• Orange dotted pulsing arrow = asynchronous token-metering / chargeback emission, does not block the response&lt;br&gt;• Identity note: step 1 uses OAuth2 client-credentials or a subscription key (no tenant restriction); step 2 uses the gateway&#39;s own managed identity, which is a same-tenant hop" vertex="1">
+          <mxGeometry height="110" width="1000" x="60" y="460" as="geometry" />
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
 </mxfile>

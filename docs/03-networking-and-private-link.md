@@ -9,6 +9,15 @@
 
 Both are legitimate — the choice is a customer network-policy question, not an architecture blocker either way.
 
+## VNet peering is not required, and is the wrong tool here
+
+A common first instinct is "don't we need to peer the Customer VNet with the Provider VNet?" No — and it wouldn't be a good fit even if it were an option:
+
+- **VNet peering connects two entire VNets** — it exchanges routes and gives broad L3 reachability between everything in both VNets, requires non-overlapping address spaces, and cross-tenant peering additionally needs an Azure AD B2B/guest trust relationship between the two tenants. That's a lot of shared surface area for "one app needs to reach one gateway."
+- **Private Link exposes exactly one resource** (APIM) as a single private IP that gets its own network interface *inside the customer's VNet* — nothing else in either VNet becomes reachable, no routes are exchanged, and there's no CIDR-overlap risk because Private Link NATs the traffic on the provider side.
+
+Practically: the customer creates a **Private Endpoint** in their own subnet pointing at APIM's resource ID (or a shared alias for cross-tenant lookups), the provider **approves** the resulting connection request, and that approval — not network peering — is the actual trust boundary being crossed.
+
 ## Why cross-tenant Private Link works
 
 Azure Private Link is designed for exactly this: a **consumer** resource (private endpoint) in one tenant connecting to a **provider** resource (Private Link service) that lives in a different tenant. The provider tenant approves each connection request individually (or via automatic approval rules), which gives natural per-client governance — nothing connects without explicit acceptance.
