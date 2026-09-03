@@ -1,0 +1,63 @@
+<mxfile host="app.diagrams.net" agent="architecture-cookbook" version="24.7.0" type="device">
+  <diagram id="identity-token-sequence" name="Identity and Token Sequence">
+    <mxGraphModel dx="1400" dy="800" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1320" pageHeight="720" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+
+        <mxCell id="title" value="Identity and Token Sequence - Who Authenticates to Whom, and With What" style="text;html=1;align=center;verticalAlign=middle;fontSize=15;fontStyle=1;fillColor=none;strokeColor=none;" vertex="1" parent="1">
+          <mxGeometry x="0" y="0" width="1300" height="28" as="geometry" />
+        </mxCell>
+
+        <!-- Actor headers -->
+        <mxCell id="a_user" value="Customer User" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;fontStyle=1;fontSize=10;" vertex="1" parent="1">
+          <mxGeometry x="30" y="50" width="140" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="a_platform" value="ISV Platform" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;fontStyle=1;fontSize=10;" vertex="1" parent="1">
+          <mxGeometry x="210" y="50" width="140" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="a_kv" value="Key Vault&#10;(credential store)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;fontStyle=1;fontSize=10;" vertex="1" parent="1">
+          <mxGeometry x="390" y="50" width="140" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="a_gw" value="Gateway&#10;(Azure API Management)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;fontStyle=1;fontSize=10;" vertex="1" parent="1">
+          <mxGeometry x="570" y="50" width="140" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="a_entra" value="Provider Entra ID" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;fontStyle=1;fontSize=10;" vertex="1" parent="1">
+          <mxGeometry x="750" y="50" width="140" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="a_foundry" value="Microsoft Foundry" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#e1d5e7;strokeColor=#9673a6;fontStyle=1;fontSize=10;" vertex="1" parent="1">
+          <mxGeometry x="930" y="50" width="140" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="a_anthropic" value="Anthropic" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffe6cc;strokeColor=#d79b00;fontStyle=1;fontSize=10;" vertex="1" parent="1">
+          <mxGeometry x="1110" y="50" width="140" height="40" as="geometry" />
+        </mxCell>
+
+        <!-- Lifelines -->
+        <mxCell id="ll_user" style="endArrow=none;dashed=1;html=1;strokeColor=#999999;" edge="1" parent="1"><mxGeometry relative="1" as="geometry"><mxPoint x="100" y="90" as="sourcePoint" /><mxPoint x="100" y="670" as="targetPoint" /></mxGeometry></mxCell>
+        <mxCell id="ll_platform" style="endArrow=none;dashed=1;html=1;strokeColor=#999999;" edge="1" parent="1"><mxGeometry relative="1" as="geometry"><mxPoint x="280" y="90" as="sourcePoint" /><mxPoint x="280" y="670" as="targetPoint" /></mxGeometry></mxCell>
+        <mxCell id="ll_kv" style="endArrow=none;dashed=1;html=1;strokeColor=#999999;" edge="1" parent="1"><mxGeometry relative="1" as="geometry"><mxPoint x="460" y="90" as="sourcePoint" /><mxPoint x="460" y="670" as="targetPoint" /></mxGeometry></mxCell>
+        <mxCell id="ll_gw" style="endArrow=none;dashed=1;html=1;strokeColor=#999999;" edge="1" parent="1"><mxGeometry relative="1" as="geometry"><mxPoint x="640" y="90" as="sourcePoint" /><mxPoint x="640" y="670" as="targetPoint" /></mxGeometry></mxCell>
+        <mxCell id="ll_entra" style="endArrow=none;dashed=1;html=1;strokeColor=#999999;" edge="1" parent="1"><mxGeometry relative="1" as="geometry"><mxPoint x="820" y="90" as="sourcePoint" /><mxPoint x="820" y="670" as="targetPoint" /></mxGeometry></mxCell>
+        <mxCell id="ll_foundry" style="endArrow=none;dashed=1;html=1;strokeColor=#999999;" edge="1" parent="1"><mxGeometry relative="1" as="geometry"><mxPoint x="1000" y="90" as="sourcePoint" /><mxPoint x="1000" y="670" as="targetPoint" /></mxGeometry></mxCell>
+        <mxCell id="ll_anthropic" style="endArrow=none;dashed=1;html=1;strokeColor=#999999;" edge="1" parent="1"><mxGeometry relative="1" as="geometry"><mxPoint x="1180" y="90" as="sourcePoint" /><mxPoint x="1180" y="670" as="targetPoint" /></mxGeometry></mxCell>
+
+        <!-- Sequence arrows -->
+        <mxCell id="s1" value="1. Sign-in with customer Entra ID" style="endArrow=block;html=1;fontSize=9;strokeColor=#1a73e8;" edge="1" parent="1"><mxGeometry relative="1" as="geometry"><mxPoint x="100" y="130" as="sourcePoint" /><mxPoint x="280" y="130" as="targetPoint" /></mxGeometry></mxCell>
+        <mxCell id="s2" value="2. Fetch client credential (never a Foundry key)" style="endArrow=block;html=1;fontSize=9;strokeColor=#1a73e8;" edge="1" parent="1"><mxGeometry relative="1" as="geometry"><mxPoint x="280" y="165" as="sourcePoint" /><mxPoint x="460" y="165" as="targetPoint" /></mxGeometry></mxCell>
+        <mxCell id="s3" value="3. Return client secret / certificate reference" style="endArrow=block;html=1;fontSize=9;strokeColor=#1a73e8;dashed=1;" edge="1" parent="1"><mxGeometry relative="1" as="geometry"><mxPoint x="460" y="200" as="sourcePoint" /><mxPoint x="280" y="200" as="targetPoint" /></mxGeometry></mxCell>
+        <mxCell id="s4" value="4. POST request + OAuth2 client-credentials token (or subscription key) + optional x-user-id header" style="endArrow=block;html=1;fontSize=9;strokeColor=#1a73e8;" edge="1" parent="1"><mxGeometry relative="1" as="geometry"><mxPoint x="280" y="245" as="sourcePoint" /><mxPoint x="640" y="245" as="targetPoint" /></mxGeometry></mxCell>
+        <mxCell id="s5" value="5. validate-jwt (or subscription key lookup) - resolve product + client" style="endArrow=block;html=1;fontSize=9;strokeColor=#2d7d46;" edge="1" parent="1"><mxGeometry relative="1" as="geometry"><mxPoint x="640" y="285" as="sourcePoint" /><mxPoint x="820" y="285" as="targetPoint" /></mxGeometry></mxCell>
+        <mxCell id="s6" value="6. Token valid - claims returned" style="endArrow=block;html=1;fontSize=9;strokeColor=#2d7d46;dashed=1;" edge="1" parent="1"><mxGeometry relative="1" as="geometry"><mxPoint x="820" y="320" as="sourcePoint" /><mxPoint x="640" y="320" as="targetPoint" /></mxGeometry></mxCell>
+        <mxCell id="s7" value="7. authentication-managed-identity - request Entra token for the Foundry scope (SAME tenant)" style="endArrow=block;html=1;fontSize=9;strokeColor=#2d7d46;" edge="1" parent="1"><mxGeometry relative="1" as="geometry"><mxPoint x="640" y="360" as="sourcePoint" /><mxPoint x="820" y="360" as="targetPoint" /></mxGeometry></mxCell>
+        <mxCell id="s8" value="8. Managed identity token issued" style="endArrow=block;html=1;fontSize=9;strokeColor=#2d7d46;dashed=1;" edge="1" parent="1"><mxGeometry relative="1" as="geometry"><mxPoint x="820" y="395" as="sourcePoint" /><mxPoint x="640" y="395" as="targetPoint" /></mxGeometry></mxCell>
+        <mxCell id="s9" value="9. Forward request with managed-identity bearer token" style="endArrow=block;html=1;fontSize=9;strokeColor=#9673a6;" edge="1" parent="1"><mxGeometry relative="1" as="geometry"><mxPoint x="640" y="435" as="sourcePoint" /><mxPoint x="1000" y="435" as="targetPoint" /></mxGeometry></mxCell>
+        <mxCell id="s10" value="10. Route to Claude deployment (Anthropic-operated inference)" style="endArrow=block;html=1;fontSize=9;strokeColor=#9673a6;" edge="1" parent="1"><mxGeometry relative="1" as="geometry"><mxPoint x="1000" y="475" as="sourcePoint" /><mxPoint x="1180" y="475" as="targetPoint" /></mxGeometry></mxCell>
+        <mxCell id="s11" value="11. Completion + token usage" style="endArrow=block;html=1;fontSize=9;strokeColor=#d79b00;dashed=1;" edge="1" parent="1"><mxGeometry relative="1" as="geometry"><mxPoint x="1180" y="515" as="sourcePoint" /><mxPoint x="1000" y="515" as="targetPoint" /></mxGeometry></mxCell>
+        <mxCell id="s12" value="12. Response" style="endArrow=block;html=1;fontSize=9;strokeColor=#9673a6;dashed=1;" edge="1" parent="1"><mxGeometry relative="1" as="geometry"><mxPoint x="1000" y="550" as="sourcePoint" /><mxPoint x="640" y="550" as="targetPoint" /></mxGeometry></mxCell>
+        <mxCell id="s13" value="13. Response + emit llm-emit-token-metric (dimensioned by client) async to Azure Monitor" style="endArrow=block;html=1;fontSize=9;strokeColor=#2d7d46;dashed=1;" edge="1" parent="1"><mxGeometry relative="1" as="geometry"><mxPoint x="640" y="590" as="sourcePoint" /><mxPoint x="280" y="590" as="targetPoint" /></mxGeometry></mxCell>
+        <mxCell id="s14" value="14. Rendered result (customer identity is only ever used for the step-4 attribution header)" style="endArrow=block;html=1;fontSize=9;strokeColor=#1a73e8;dashed=1;" edge="1" parent="1"><mxGeometry relative="1" as="geometry"><mxPoint x="280" y="630" as="sourcePoint" /><mxPoint x="100" y="630" as="targetPoint" /></mxGeometry></mxCell>
+
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>
