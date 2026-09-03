@@ -1,4 +1,4 @@
-# 8. Diagrams Index — How to Open, Edit, and Animate
+# 5. Diagrams Index — How to Open, Edit, and Animate
 
 All diagrams are plain `.drawio` XML files (uncompressed, human-diffable) under [diagrams/](../diagrams/). Each one also has a pre-rendered `.png` of the same name in the same folder, for quick viewing without opening draw.io.
 
@@ -24,11 +24,17 @@ Network engineers' view: VNets, subnets, NSGs, DNS, and the cross-tenant Private
 ### 4. `04-identity-and-token-sequence.drawio`
 A 14-step sequence diagram (lifelines for User, ISV Platform, Key Vault, Gateway, Provider Entra ID, Foundry, Anthropic) showing exactly which credential is used at each hop and where identity terminates. Use this to settle any "wait, whose identity is this?" question definitively.
 
-### 5. `05-commercial-options-comparison.drawio`
-Option A vs. Option B, side by side, including the billing/contracting differences and the watch-outs for each. Use this in the commercial/procurement conversation, separate from the technical walkthrough.
-
-### 6. `06-animated-call-flow.drawio`
+### 5. `05-animated-call-flow.drawio`
 A simplified 5-node version of diagram 2, with edges styled `flowAnimation=1` — when opened in draw.io (desktop, web, or the VS Code extension), the arrows visibly pulse in the direction of travel, color-coded: blue = outbound request, green = response, orange dotted = asynchronous token-metering emission. This is the "just show me it working" diagram for a live session — no export/video needed, it animates natively when opened.
+
+### 6. `06-two-options-call-flow.drawio` — main diagram for the first customer call
+End-to-end call flow with **Option 1 (OAuth2 client-credentials)** and **Option 2 (APIM subscription key)** shown as alternative front-door paths into the same gateway, making explicit that everything from the gateway onward (managed identity to Foundry, Foundry to Anthropic) is identical either way. Use this when presenting [docs/00-first-call-discussion-guide.md](00-first-call-discussion-guide.md).
+
+### 7. `07-network-architecture.drawio` — main diagram for the first customer call
+Network-layer view: Customer → APIM → Foundry → Anthropic, the customer's no-VNet-peering constraint called out explicitly, both connectivity paths (Private Link vs. public endpoint + allow-list), and a region/latency note. Use this for the network-design part of the first call.
+
+### Phase 2: `05-commercial-options-comparison.drawio`
+Lives in [phase-2-implementation/diagrams/](../phase-2-implementation/diagrams/), not here. Option A vs. Option B, side by side, including the billing/contracting differences and the watch-outs for each — this is the later-stage commercial/procurement conversation, separate from the first-call technical walkthrough and separate from the Option 1/Option 2 front-door choice.
 
 ## Editing conventions used across all diagrams
 

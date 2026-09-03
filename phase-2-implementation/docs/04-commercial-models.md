@@ -7,7 +7,7 @@ Two ways to deliver Claude-via-Foundry to a client, sharing the same application
 The provider's own Anthropic contract and Marketplace subscription sit in the **Provider Tenant**. The client's ISV Platform reaches it cross-tenant through the gateway described in this repo.
 
 - Fast to stand up per client — no new procurement per engagement.
-- Single relationship for the provider with better volume-pricing leverage (subject to reconfirming pricing — see [docs/07-constraints-and-open-risks.md](07-constraints-and-open-risks.md)).
+- Single relationship for the provider with better volume-pricing leverage (subject to reconfirming pricing — see [docs/04-constraints-and-open-risks.md](../../docs/04-constraints-and-open-risks.md)).
 - Central governance: one gateway, one place to apply quota/rate-limit/content-safety policy across all clients.
 - **Watch-outs:**
   - Customer prompts/completions leave the customer's tenant and geography — this needs an explicit data-processing agreement, not just an architecture sign-off.
@@ -34,4 +34,4 @@ The client provisions **their own** Foundry account, Claude deployment, and Anth
 | Production, high volume, long-term engagement | **Option B** as the default target — start on Option A if needed, migrate later (the gateway pattern makes this a backend-swap, not a rebuild) |
 | Client is on a CSP subscription | Confirm CSP support for the specific model offer **before** proposing Option B |
 
-See [diagrams/05-commercial-options-comparison.png](../diagrams/05-commercial-options-comparison.png) for the side-by-side flow, and [docs/07-constraints-and-open-risks.md](07-constraints-and-open-risks.md) for the full list of things to reconfirm before a client commitment.
+See [diagrams/05-commercial-options-comparison.png](../diagrams/05-commercial-options-comparison.png) for the side-by-side flow, and [docs/04-constraints-and-open-risks.md](../../docs/04-constraints-and-open-risks.md) for the full list of things to reconfirm before a client commitment.

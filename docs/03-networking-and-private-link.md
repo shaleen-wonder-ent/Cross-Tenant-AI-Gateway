@@ -27,7 +27,7 @@ Azure Private Link is designed for exactly this: a **consumer** resource (privat
 ## What lives where
 
 - **Customer VNet**: the ISV Platform's compute (App Service / AKS / VM), an optional private endpoint subnet, an NSG restricting egress to only the gateway's private IP (or its public FQDN, in the public-path option), and a Private DNS zone (`privatelink.azure-api.net`) so the gateway's hostname resolves to the private IP instead of the public one.
-- **Provider VNet**: the APIM subnet (v2 tier required — see [docs/05-apim-gateway-configuration.md](05-apim-gateway-configuration.md)), the Private Link service/private endpoint that accepts cross-tenant connection requests, and a **same-tenant** private endpoint from APIM to Microsoft Foundry (with Foundry's public network access disabled).
+- **Provider VNet**: the APIM subnet (v2 tier required — see [phase-2-implementation/docs/05-apim-gateway-configuration.md](../phase-2-implementation/docs/05-apim-gateway-configuration.md)), the Private Link service/private endpoint that accepts cross-tenant connection requests, and a **same-tenant** private endpoint from APIM to Microsoft Foundry (with Foundry's public network access disabled).
 
 See [diagrams/03-networking-and-private-link.png](../diagrams/03-networking-and-private-link.png) for the full layout.
 

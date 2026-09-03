@@ -1,0 +1,68 @@
+<mxfile host="app.diagrams.net" agent="architecture-cookbook" version="24.7.0" type="device">
+  <diagram id="two-options-call-flow" name="Two Options Call Flow">
+    <mxGraphModel dx="1400" dy="800" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1200" pageHeight="760" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+
+        <mxCell id="title" value="Two Front-Door Options - Same Gateway, Same Back Door" style="text;html=1;align=center;verticalAlign=middle;fontSize=15;fontStyle=1;fillColor=none;strokeColor=none;" vertex="1" parent="1">
+          <mxGeometry x="0" y="0" width="1160" height="28" as="geometry" />
+        </mxCell>
+        <mxCell id="subtitle" value="Only the front-door credential differs between Option 1 and Option 2 - everything from the gateway onward is identical" style="text;html=1;align=center;verticalAlign=middle;fontSize=11;fontStyle=2;fontColor=#666666;fillColor=none;strokeColor=none;" vertex="1" parent="1">
+          <mxGeometry x="0" y="26" width="1160" height="20" as="geometry" />
+        </mxCell>
+
+        <mxCell id="colA_hdr" value="CUSTOMER TENANT" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;fontStyle=1;fontSize=12;" vertex="1" parent="1">
+          <mxGeometry x="40" y="60" width="340" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="colB_hdr" value="CROSS-TENANT BOUNDARY - CHOOSE ONE OPTION" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#f5f5f5;strokeColor=#666666;fontStyle=1;fontSize=12;" vertex="1" parent="1">
+          <mxGeometry x="420" y="60" width="320" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="colC_hdr" value="PROVIDER TENANT" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;fontStyle=1;fontSize=12;" vertex="1" parent="1">
+          <mxGeometry x="780" y="60" width="360" height="30" as="geometry" />
+        </mxCell>
+
+        <mxCell id="user" value="End User&lt;br&gt;Signs in with the CUSTOMER's own Entra ID" style="rounded=1;whiteSpace=wrap;html=1;align=left;verticalAlign=top;spacing=6;fontSize=10;fillColor=#ffffff;strokeColor=#6c8ebf;" vertex="1" parent="1">
+          <mxGeometry x="40" y="110" width="340" height="70" as="geometry" />
+        </mxCell>
+        <mxCell id="isv" value="ISV Platform (AI Force App)&lt;br&gt;Holds EITHER an OAuth2 client credential OR an APIM subscription key - never a raw Foundry/Anthropic key" style="rounded=1;whiteSpace=wrap;html=1;align=left;verticalAlign=top;spacing=6;fontSize=10;fillColor=#ffffff;strokeColor=#6c8ebf;" vertex="1" parent="1">
+          <mxGeometry x="40" y="210" width="340" height="90" as="geometry" />
+        </mxCell>
+
+        <mxCell id="option1" value="OPTION 1: OAuth2 client-credentials&lt;br&gt;ISV Platform gets a Bearer JWT from Provider Entra ID (client_credentials grant), presents it to APIM. validate-jwt checks issuer/audience/claims." style="rounded=1;whiteSpace=wrap;html=1;align=left;verticalAlign=top;spacing=6;fontSize=10;fillColor=#dae8fc;strokeColor=#1a73e8;strokeWidth=2;" vertex="1" parent="1">
+          <mxGeometry x="420" y="150" width="320" height="100" as="geometry" />
+        </mxCell>
+        <mxCell id="option2" value="OPTION 2: APIM Subscription Key&lt;br&gt;ISV Platform sends an Ocp-Apim-Subscription-Key header. APIM validates the key against the client's product/subscription." style="rounded=1;whiteSpace=wrap;html=1;align=left;verticalAlign=top;spacing=6;fontSize=10;fillColor=#e0f7fa;strokeColor=#00838f;strokeWidth=2;" vertex="1" parent="1">
+          <mxGeometry x="420" y="270" width="320" height="100" as="geometry" />
+        </mxCell>
+
+        <mxCell id="apim" value="Azure API Management (v2 tier)&lt;br&gt;Either option authenticates the caller and resolves it to a per-client product for quota + metering" style="rounded=1;whiteSpace=wrap;html=1;align=left;verticalAlign=top;spacing=6;fontSize=10;fillColor=#ffffff;strokeColor=#82b366;" vertex="1" parent="1">
+          <mxGeometry x="780" y="180" width="360" height="110" as="geometry" />
+        </mxCell>
+        <mxCell id="mi" value="Managed identity to Foundry (SAME-TENANT hop) - identical regardless of Option 1 or Option 2" style="rounded=1;whiteSpace=wrap;html=1;align=left;verticalAlign=top;spacing=6;fontSize=10;fillColor=#d5e8d4;strokeColor=#82b366;" vertex="1" parent="1">
+          <mxGeometry x="780" y="310" width="360" height="90" as="geometry" />
+        </mxCell>
+        <mxCell id="foundry" value="Microsoft Foundry - Claude deployment" style="rounded=1;whiteSpace=wrap;html=1;align=left;verticalAlign=top;spacing=6;fontSize=10;fillColor=#ffffff;strokeColor=#82b366;" vertex="1" parent="1">
+          <mxGeometry x="780" y="420" width="360" height="70" as="geometry" />
+        </mxCell>
+        <mxCell id="anthropic" value="Anthropic-operated inference" style="rounded=1;whiteSpace=wrap;html=1;align=left;verticalAlign=top;spacing=6;fontSize=10;fillColor=#ffe6cc;strokeColor=#d79b00;" vertex="1" parent="1">
+          <mxGeometry x="780" y="510" width="360" height="60" as="geometry" />
+        </mxCell>
+
+        <mxCell id="e_user_isv" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;endArrow=block;strokeColor=#6c8ebf;exitX=0.5;exitY=1;entryX=0.5;entryY=0;" edge="1" parent="1" source="user" target="isv"><mxGeometry relative="1" as="geometry" /></mxCell>
+        <mxCell id="e_isv_opt1" value="1a" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;endArrow=block;strokeColor=#1a73e8;strokeWidth=2;fontColor=#ffffff;labelBackgroundColor=#1a73e8;fontStyle=1;exitX=1;exitY=0.3;entryX=0;entryY=0.5;" edge="1" parent="1" source="isv" target="option1"><mxGeometry relative="1" as="geometry" /></mxCell>
+        <mxCell id="e_isv_opt2" value="1b" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;endArrow=block;dashed=1;strokeColor=#00838f;strokeWidth=2;fontColor=#ffffff;labelBackgroundColor=#00838f;fontStyle=1;exitX=1;exitY=0.8;entryX=0;entryY=0.5;" edge="1" parent="1" source="isv" target="option2"><mxGeometry relative="1" as="geometry" /></mxCell>
+        <mxCell id="e_opt1_apim" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;endArrow=block;strokeColor=#1a73e8;strokeWidth=2;exitX=1;exitY=0.3;entryX=0;entryY=0.3;" edge="1" parent="1" source="option1" target="apim"><mxGeometry relative="1" as="geometry" /></mxCell>
+        <mxCell id="e_opt2_apim" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;endArrow=block;dashed=1;strokeColor=#00838f;strokeWidth=2;exitX=1;exitY=0.7;entryX=0;entryY=0.7;" edge="1" parent="1" source="option2" target="apim"><mxGeometry relative="1" as="geometry" /></mxCell>
+        <mxCell id="e_apim_mi" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;endArrow=block;strokeColor=#82b366;exitX=0.5;exitY=1;entryX=0.5;entryY=0;" edge="1" parent="1" source="apim" target="mi"><mxGeometry relative="1" as="geometry" /></mxCell>
+        <mxCell id="e_mi_foundry" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;endArrow=block;strokeColor=#82b366;exitX=0.5;exitY=1;entryX=0.5;entryY=0;" edge="1" parent="1" source="mi" target="foundry"><mxGeometry relative="1" as="geometry" /></mxCell>
+        <mxCell id="e_foundry_anthropic" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;endArrow=block;strokeColor=#d79b00;exitX=0.5;exitY=1;entryX=0.5;entryY=0;" edge="1" parent="1" source="foundry" target="anthropic"><mxGeometry relative="1" as="geometry" /></mxCell>
+
+        <mxCell id="footer" value="Both options terminate identity at the gateway. Only the front-door credential (Option 1 vs Option 2, shown above) differs - everything from APIM onward (managed identity to Foundry, Foundry's internal call to Anthropic) is identical regardless of choice. A client can start on Option 2 for a fast pilot and move to Option 1 later without changing anything past the front door." style="rounded=1;whiteSpace=wrap;html=1;align=center;verticalAlign=middle;spacing=6;fontSize=10;fontStyle=2;fillColor=#f5f5f5;strokeColor=#666666;" vertex="1" parent="1">
+          <mxGeometry x="40" y="600" width="1100" height="80" as="geometry" />
+        </mxCell>
+
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>

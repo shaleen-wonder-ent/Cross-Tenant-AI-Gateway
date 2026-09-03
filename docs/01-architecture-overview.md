@@ -105,10 +105,11 @@ See [diagrams/01-solution-architecture-overview.png](../diagrams/01-solution-arc
 - **The ISV Platform never holds the provider's raw Anthropic/Foundry key.** It authenticates to APIM; APIM holds the real backend credential via managed identity — same tenant, no cross-tenant AAD problem at that hop.
 - **Per-client governance.** APIM gives token-quota policies, rate limiting, and token-metering **scoped per client subscription/product**, so usage of shared capacity can be metered and charged back per customer even though everyone shares the provider's Anthropic capacity.
 - **Auditability without identity leakage.** The customer's Entra ID/employee claim is passed as a custom header (e.g., `x-user-id`) purely for logging/attribution — it is never used to authenticate against the provider's Foundry resource. The two identity domains stay separate.
-- **Swap-ready.** If a client later moves to their own Anthropic contract (Option B, see [docs/04-commercial-models.md](04-commercial-models.md)), only the ISV Platform's backend endpoint changes — the calling pattern ("call a gateway") stays the same.
+- **Swap-ready.** If a client later moves to their own Anthropic contract (Option B, see [phase-2-implementation/docs/04-commercial-models.md](../phase-2-implementation/docs/04-commercial-models.md)), only the ISV Platform's backend endpoint changes — the calling pattern ("call a gateway") stays the same.
 
 ## Read next
 
+- [docs/00-first-call-discussion-guide.md](00-first-call-discussion-guide.md) for the two front-door options (OAuth2 vs. subscription key) to bring to the first customer call
 - [docs/02-identity-and-trust-boundary.md](02-identity-and-trust-boundary.md) for exactly how identity is split front-door vs. back-door
 - [docs/03-networking-and-private-link.md](03-networking-and-private-link.md) for the connectivity mechanics
-- [docs/06-implementation-runbook.md](06-implementation-runbook.md) to start building
+- [phase-2-implementation/docs/06-implementation-runbook.md](../phase-2-implementation/docs/06-implementation-runbook.md) to start building, once the first call has landed on an option
