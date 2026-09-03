@@ -25,7 +25,7 @@
                 <mxCell id="monitor_box" parent="1" style="rounded=1;whiteSpace=wrap;html=1;align=center;verticalAlign=middle;fontSize=11;fillColor=#e1d5e7;strokeColor=#9673a6;" value="Azure Monitor&lt;br&gt;token metrics / chargeback" vertex="1">
                     <mxGeometry height="90" width="240" x="440" y="330" as="geometry"/>
                 </mxCell>
-                <mxCell id="req1" edge="1" parent="1" source="platform_box" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;endArrow=block;dashed=1;dashPattern=4 4;flowAnimation=1;strokeColor=#1a73e8;strokeWidth=2;fontSize=9;fontColor=#1a73e8;exitX=1;exitY=0.3;entryX=0;entryY=0.3;" target="gateway_box" value="1. Request + OAuth2 token">
+                <mxCell id="req1" edge="1" parent="1" source="platform_box" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;endArrow=block;dashed=1;dashPattern=4 4;flowAnimation=1;strokeColor=#1a73e8;strokeWidth=2;fontSize=9;fontColor=#1a73e8;exitX=1;exitY=0.3;entryX=0;entryY=0.3;" target="gateway_box" value="1. Request + OAuth2 token / Subscription Key">
                     <mxGeometry relative="1" x="-0.1429" y="37" as="geometry">
                         <mxPoint as="offset"/>
                     </mxGeometry>
