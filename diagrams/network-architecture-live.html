@@ -146,13 +146,24 @@
   .legend{ display:flex; flex-wrap:wrap; gap:18px; justify-content:center; margin-top:14px; font-size:11.5px; color:var(--text-dim); }
   .legend .dot{width:9px; height:9px; border-radius:50%; display:inline-block; margin-right:6px; vertical-align:middle;}
   footer{ text-align:center; color:var(--text-dim); font-size:11px; padding:6px 0 30px;}
+
+  #pausedTag{
+    position:fixed; top:18px; right:22px; z-index:50;
+    background:linear-gradient(135deg,#ffd27a,#ff9d3d); color:#04121c; font-weight:800; font-size:12px;
+    padding:9px 16px; border-radius:20px; box-shadow:0 6px 20px rgba(255,157,61,.45);
+    opacity:0; pointer-events:none; transform:translateY(-8px); transition:all .2s ease;
+  }
+  #pausedTag.show{ opacity:1; transform:translateY(0); }
 </style>
 </head>
 <body>
 
+<div id="pausedTag">⏸ Paused — click anywhere to resume</div>
+
 <header>
   <h1>Cross-Tenant Network Architecture — Live Call Flow</h1>
   <p>Watch exactly where a call originates, how it traverses the tenant boundary, and which components it touches</p>
+  <p style="margin-top:4px; opacity:.7;">Click anywhere on the page while playing to pause &middot; click again to resume</p>
 </header>
 
 <div class="controls">
@@ -256,7 +267,21 @@
 <footer>Cross-Tenant AI Gateway · interactive call-flow reference · open directly in any modern browser, no server required</footer>
 
 <script>
+const SPEED_SCALE = 1.8; // multiplier applied to every animation/delay below - raise to slow down
 const state = { auth: 'oauth', conn: 'pl', playing: false };
+
+let paused = false;
+let pauseStartTs = null;
+let pausedAccum = 0;
+
+function vNow(){ return (paused ? pauseStartTs : performance.now()) - pausedAccum; }
+
+function setPaused(p){
+  if(p === paused) return;
+  if(p){ paused = true; pauseStartTs = performance.now(); }
+  else { pausedAccum += performance.now() - pauseStartTs; paused = false; pauseStartTs = null; }
+  document.getElementById('pausedTag').classList.toggle('show', paused);
+}
 
 const nodes = {
   user:{x:165,y:120,cls:'c'}, app:{x:165,y:300,cls:'c'}, pe:{x:165,y:480,cls:'c'},
@@ -306,12 +331,22 @@ refreshTopology();
 function lerp(a,b,t){ return a+(b-a)*t; }
 function easeInOut(t){ return t<.5 ? 2*t*t : 1-Math.pow(-2*t+2,2)/2; }
 
+function pausableDelay(ms){
+  ms = ms * SPEED_SCALE;
+  return new Promise(resolve=>{
+    const start = vNow();
+    function tick(){ if(vNow()-start >= ms) resolve(); else requestAnimationFrame(tick); }
+    requestAnimationFrame(tick);
+  });
+}
+
 function movePacket(from, to, ms, color){
+  ms = ms * SPEED_SCALE;
   return new Promise(resolve=>{
     const p = el('packet'); p.setAttribute('fill', color);
-    const start = performance.now();
-    function frame(now){
-      const t = Math.min(1,(now-start)/ms);
+    const start = vNow();
+    function frame(){
+      const t = Math.min(1,(vNow()-start)/ms);
       const e = easeInOut(t);
       p.setAttribute('cx', lerp(from.x, to.x, e));
       p.setAttribute('cy', lerp(from.y, to.y, e));
@@ -322,11 +357,12 @@ function movePacket(from, to, ms, color){
 }
 
 function sideTrip(from, to, ms, color){
+  ms = ms * SPEED_SCALE;
   return new Promise(resolve=>{
     const p = el('sidepacket'); p.setAttribute('fill', color); p.setAttribute('opacity','1');
-    const start = performance.now(); const half = ms/2;
-    function frame(now){
-      const dt = now-start;
+    const start = vNow(); const half = ms/2;
+    function frame(){
+      const dt = vNow()-start;
       let t, a=from, b=to;
       if(dt < half){ t = dt/half; }
       else { t = (dt-half)/half; a = to; b = from; }
@@ -341,7 +377,7 @@ function sideTrip(from, to, ms, color){
 
 function badge(id, text, ms){
   const b = el(id); b.textContent = text; b.classList.add('show');
-  setTimeout(()=>b.classList.remove('show'), ms);
+  pausableDelay(ms).then(()=>b.classList.remove('show'));
 }
 
 function setCaption(tagClass, tagText, text, stepNum, stepTotal){
@@ -366,11 +402,12 @@ async function runStep({from,to,color,activeCls,label,tag,tagText,dwell=140}){
   const connId = connectorForSegment(from,to);
   setConnState(connId, activeCls);
   await movePacket(nodes[from], nodes[to], 900, color);
-  if(dwell) await new Promise(r=>setTimeout(r,dwell));
+  if(dwell) await pausableDelay(dwell);
 }
 
 function resetStage(){
   state.playing = false;
+  setPaused(false); pausedAccum = 0;
   el('btn-play').disabled = false;
   clearActiveNodes();
   setConnState(null,null);
@@ -385,6 +422,7 @@ function resetStage(){
 async function playFlow(){
   if(state.playing) return;
   state.playing = true;
+  pausedAccum = 0; setPaused(false);
   el('btn-play').disabled = true;
   [el('btn-oauth'),el('btn-key'),el('btn-pl'),el('btn-pub')].forEach(b=>b.disabled=true);
 
@@ -410,7 +448,7 @@ async function playFlow(){
   } else {
     setCaption('req','2 · Authenticate','ISV App attaches a static <b>subscription key</b> header — no token exchange needed.',i,total);
     badge('badge-app','KEY',1200);
-    await new Promise(r=>setTimeout(r,700));
+    await pausableDelay(700);
   }
 
   // Step 3 - cross boundary
@@ -428,7 +466,7 @@ async function playFlow(){
     i,total);
   badge('badge-apim','CHECK',1200);
   setActiveNode('apim',true); setActiveNode('entra', state.auth==='oauth');
-  if(state.auth==='oauth'){ await sideTrip(nodes.apim, nodes.entra, 900, '#3ba7ff'); } else { await new Promise(r=>setTimeout(r,700)); }
+  if(state.auth==='oauth'){ await sideTrip(nodes.apim, nodes.entra, 900, '#3ba7ff'); } else { await pausableDelay(700); }
 
   // Step 5 - managed identity back door
   i++; setCaption('req','5 · Managed identity','Gateway fetches its own <b>managed-identity token</b> for Foundry — a same-tenant hop, no cross-tenant AAD involved.',i,total);
@@ -451,7 +489,7 @@ async function playFlow(){
   i++; setCaption('async','9 · Async metering','Gateway emits token metrics to <b>Azure Monitor</b> — asynchronous, does not delay the reply.',i,total);
   setActiveNode('monitor',true);
   sideTrip(nodes.apim, nodes.monitor, 900, '#c07bff');
-  await new Promise(r=>setTimeout(r,300));
+  await pausableDelay(300);
 
   // Step 10 - back to user
   i++; setCaption('resp','10 · Deliver','Response crosses back over the same path to the <b>ISV App</b> and the <b>End User</b>.',i,total);
@@ -471,6 +509,12 @@ async function playFlow(){
 }
 
 el('btn-play').onclick = playFlow;
+
+document.addEventListener('click', (e)=>{
+  if(e.target.closest('button')) return;
+  if(!state.playing) return;
+  setPaused(!paused);
+});
 </script>
 </body>
 </html>
