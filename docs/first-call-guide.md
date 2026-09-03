@@ -48,6 +48,8 @@ You can start on Path 2 for a pilot and move to Path 1 later — nothing past th
 
 Either way, the gateway's own connection to Foundry stays entirely inside the provider's tenant and isn't part of this decision.
 
+For the call itself, open [diagrams/network-architecture-live.html](../diagrams/network-architecture-live.html) in a browser and hit **Play flow** — it animates the call originating at the end user, crossing the boundary, and traversing every component through to Anthropic and back, with Path 1/2 and Private Link/Public toggles.
+
 ## Constraints to plan for
 
 - **Region and latency:** the provider's tenant is a billing/identity boundary, not a fixed region — the gateway and Foundry can be deployed in a region close to you, subject to where the Claude model is actually available. Confirm the supported region list before committing to a location.

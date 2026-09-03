@@ -1,0 +1,476 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Cross-Tenant Network Architecture — Live Call Flow</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<style>
+  :root{
+    --bg-deep:#0b1120;
+    --bg-panel:#111a2e;
+    --customer:#3ba7ff;
+    --customer-glow: rgba(59,167,255,.55);
+    --provider:#2fe0a8;
+    --provider-glow: rgba(47,224,168,.5);
+    --anthropic:#ff9d3d;
+    --anthropic-glow: rgba(255,157,61,.55);
+    --async:#c07bff;
+    --danger:#ff5c7a;
+    --text:#e7edf7;
+    --text-dim:#8ea0bd;
+    --line-idle: rgba(142,160,189,.28);
+  }
+  *{box-sizing:border-box;}
+  html,body{
+    margin:0; padding:0; background:radial-gradient(1200px 800px at 20% -10%, #14213d 0%, var(--bg-deep) 55%);
+    color:var(--text); font-family:'Segoe UI',system-ui,-apple-system,Roboto,Arial,sans-serif;
+    overflow-x:auto;
+  }
+  header{
+    padding:22px 32px 8px; text-align:center;
+  }
+  header h1{
+    margin:0 0 4px; font-size:22px; font-weight:700; letter-spacing:.2px;
+    background:linear-gradient(90deg,#8fd7ff,#c8ffe9); -webkit-background-clip:text; background-clip:text; color:transparent;
+  }
+  header p{margin:0; color:var(--text-dim); font-size:13px;}
+
+  .controls{
+    display:flex; flex-wrap:wrap; gap:10px; justify-content:center; align-items:center;
+    padding:16px 20px; margin:14px auto 6px; max-width:1360px;
+  }
+  .group{
+    display:flex; gap:6px; background:rgba(255,255,255,.04); border:1px solid rgba(255,255,255,.08);
+    padding:5px; border-radius:12px; backdrop-filter:blur(6px);
+  }
+  .group span.grouplabel{
+    align-self:center; font-size:11px; color:var(--text-dim); padding:0 8px; text-transform:uppercase; letter-spacing:.06em;
+  }
+  button{
+    font-family:inherit; cursor:pointer; border:none; border-radius:9px; padding:9px 14px; font-size:12.5px; font-weight:600;
+    color:var(--text-dim); background:transparent; transition:all .15s ease;
+  }
+  button:hover{color:var(--text); background:rgba(255,255,255,.06);}
+  button.active{
+    color:#04121c; background:linear-gradient(135deg,#8fe3ff,#63f0c4); box-shadow:0 0 18px rgba(120,220,255,.35);
+  }
+  button.primary{
+    color:#04121c; background:linear-gradient(135deg,#ffd27a,#ff9d3d); box-shadow:0 0 18px rgba(255,157,61,.4);
+    padding:9px 18px;
+  }
+  button.ghost{ border:1px solid rgba(255,255,255,.15); }
+  button:disabled{opacity:.35; cursor:not-allowed;}
+
+  .stage-wrap{ width:100%; overflow-x:auto; padding-bottom:10px;}
+  #stage{
+    position:relative; width:1360px; height:620px; margin:6px auto 0;
+  }
+  .panel{
+    position:absolute; border-radius:20px; border:1.5px dashed rgba(255,255,255,.18);
+    top:40px; height:540px;
+  }
+  .panel .panel-title{
+    position:absolute; top:-14px; left:20px; padding:3px 12px; border-radius:8px; font-size:11.5px; font-weight:700;
+    letter-spacing:.05em; text-transform:uppercase;
+  }
+  #panel-customer{ left:20px; width:290px; background:linear-gradient(180deg, rgba(59,167,255,.09), rgba(59,167,255,.02)); border-color:rgba(59,167,255,.4);}
+  #panel-customer .panel-title{ background:var(--customer); color:#04121c;}
+  #panel-provider{ left:560px; width:520px; background:linear-gradient(180deg, rgba(47,224,168,.09), rgba(47,224,168,.02)); border-color:rgba(47,224,168,.4);}
+  #panel-provider .panel-title{ background:var(--provider); color:#04121c;}
+
+  .boundary-label{
+    position:absolute; left:300px; width:260px; top:40px; height:540px;
+    display:flex; align-items:center; justify-content:center; text-align:center; pointer-events:none;
+  }
+  .boundary-label span{
+    display:inline-block; color:var(--danger); font-size:11px; font-weight:700; letter-spacing:.06em; text-transform:uppercase;
+    background:rgba(255,92,122,.08); border:1px dashed rgba(255,92,122,.4); padding:10px 10px; border-radius:10px; line-height:1.6;
+  }
+
+  .node{
+    position:absolute; width:150px; padding:12px 12px 10px; border-radius:14px; text-align:center;
+    background:rgba(17,26,46,.85); border:1.5px solid rgba(255,255,255,.14); box-shadow:0 6px 18px rgba(0,0,0,.35);
+    transform:translate(-50%,-50%); transition:box-shadow .25s ease, transform .25s ease, border-color .25s ease;
+    cursor:default;
+  }
+  .node .icon{font-size:22px; line-height:1;}
+  .node .label{font-size:11.5px; font-weight:700; margin-top:6px; color:var(--text);}
+  .node .sub{font-size:9.5px; color:var(--text-dim); margin-top:2px;}
+  .node.dim{ opacity:.32; filter:grayscale(.4); }
+  .node.active{ transform:translate(-50%,-50%) scale(1.08); z-index:5; }
+  .node.active.c{ border-color:var(--customer); box-shadow:0 0 0 3px var(--customer-glow), 0 8px 26px rgba(0,0,0,.4);}
+  .node.active.p{ border-color:var(--provider); box-shadow:0 0 0 3px var(--provider-glow), 0 8px 26px rgba(0,0,0,.4);}
+  .node.active.a{ border-color:var(--anthropic); box-shadow:0 0 0 3px var(--anthropic-glow), 0 8px 26px rgba(0,0,0,.4);}
+
+  .node .badge{
+    position:absolute; top:-9px; right:-9px; font-size:10px; font-weight:800; padding:3px 6px; border-radius:20px;
+    background:var(--async); color:#04121c; opacity:0; transform:scale(.5); transition:all .25s ease;
+  }
+  .node .badge.show{opacity:1; transform:scale(1);}
+
+  .tip{
+    position:absolute; bottom:-8px; left:50%; transform:translate(-50%,100%); width:210px; font-size:10.5px; line-height:1.4;
+    background:#0c1526; color:var(--text-dim); border:1px solid rgba(255,255,255,.12); border-radius:10px; padding:8px 10px;
+    opacity:0; pointer-events:none; transition:opacity .15s ease; z-index:20; text-align:left;
+  }
+  .node:hover .tip{opacity:1;}
+
+  svg#lines{ position:absolute; left:0; top:0; width:1360px; height:620px; overflow:visible; }
+  .connector{ fill:none; stroke:var(--line-idle); stroke-width:2; }
+  .connector.active-c{ stroke:var(--customer); filter:drop-shadow(0 0 6px var(--customer-glow)); }
+  .connector.active-p{ stroke:var(--provider); filter:drop-shadow(0 0 6px var(--provider-glow)); }
+  .connector.active-a{ stroke:var(--anthropic); filter:drop-shadow(0 0 6px var(--anthropic-glow)); }
+  .connector.dashed{ stroke-dasharray:5 6; }
+  .connector.hide{ opacity:.12; }
+
+  #packet{ filter:drop-shadow(0 0 10px currentColor) drop-shadow(0 0 18px currentColor); }
+  #sidepacket{ filter:drop-shadow(0 0 8px currentColor); }
+
+  .hud{
+    max-width:1000px; margin:18px auto 40px; padding:0 20px;
+  }
+  .progress-row{ display:flex; align-items:center; gap:12px; margin-bottom:10px;}
+  .progress-track{ flex:1; height:7px; border-radius:6px; background:rgba(255,255,255,.08); overflow:hidden;}
+  .progress-fill{ height:100%; width:0%; border-radius:6px; background:linear-gradient(90deg,#8fe3ff,#63f0c4); transition:width .25s ease;}
+  .step-count{ font-size:12px; color:var(--text-dim); min-width:64px; text-align:right;}
+  .caption{
+    background:rgba(255,255,255,.045); border:1px solid rgba(255,255,255,.1); border-radius:14px; padding:16px 20px;
+    font-size:14.5px; min-height:26px; display:flex; align-items:center; gap:10px;
+  }
+  .caption .tag{ font-size:10.5px; font-weight:800; padding:3px 9px; border-radius:20px; letter-spacing:.04em; text-transform:uppercase; }
+  .tag.req{background:var(--customer); color:#04121c;}
+  .tag.resp{background:var(--provider); color:#04121c;}
+  .tag.async{background:var(--async); color:#04121c;}
+  .tag.model{background:var(--anthropic); color:#04121c;}
+
+  .legend{ display:flex; flex-wrap:wrap; gap:18px; justify-content:center; margin-top:14px; font-size:11.5px; color:var(--text-dim); }
+  .legend .dot{width:9px; height:9px; border-radius:50%; display:inline-block; margin-right:6px; vertical-align:middle;}
+  footer{ text-align:center; color:var(--text-dim); font-size:11px; padding:6px 0 30px;}
+</style>
+</head>
+<body>
+
+<header>
+  <h1>Cross-Tenant Network Architecture — Live Call Flow</h1>
+  <p>Watch exactly where a call originates, how it traverses the tenant boundary, and which components it touches</p>
+</header>
+
+<div class="controls">
+  <div class="group">
+    <span class="grouplabel">Auth path</span>
+    <button id="btn-oauth" class="active">Path 1: OAuth2</button>
+    <button id="btn-key">Path 2: Subscription key</button>
+  </div>
+  <div class="group">
+    <span class="grouplabel">Connectivity</span>
+    <button id="btn-pl" class="active">Private Link</button>
+    <button id="btn-pub">Public endpoint</button>
+  </div>
+  <div class="group">
+    <button id="btn-play" class="primary">▶ Play flow</button>
+    <button id="btn-reset" class="ghost">⟲ Reset</button>
+  </div>
+</div>
+
+<div class="stage-wrap">
+<div id="stage">
+
+  <div class="panel" id="panel-customer"><div class="panel-title">Customer Tenant</div></div>
+  <div class="panel" id="panel-provider"><div class="panel-title">Provider Tenant</div></div>
+  <div class="boundary-label"><span>Cross-tenant boundary<br>No VNet peering — ever</span></div>
+
+  <svg id="lines">
+    <path id="l-user-app" class="connector" d="M165,140 L165,300"></path>
+    <path id="l-app-pe" class="connector" d="M165,300 L165,480"></path>
+    <path id="l-pe-apim" class="connector" d="M240,480 C 420,480 480,300 560,300"></path>
+    <path id="l-app-apim-pub" class="connector dashed" d="M240,300 L560,300"></path>
+    <path id="l-apim-entra" class="connector dashed" d="M650,270 L650,150"></path>
+    <path id="l-apim-monitor" class="connector dashed" d="M650,330 L650,460"></path>
+    <path id="l-apim-foundry" class="connector" d="M725,300 L885,300"></path>
+    <path id="l-foundry-anthropic" class="connector" d="M1035,300 L1175,300"></path>
+  </svg>
+
+  <div class="node c" id="n-user" style="left:165px; top:120px;">
+    <div class="icon">🧑‍💻</div><div class="label">End User</div><div class="sub">Initiates the call</div>
+    <div class="tip">Signs in with the <b>Customer's own Entra ID</b> — app-level access only, never used to authenticate to the provider.</div>
+  </div>
+
+  <div class="node c" id="n-app" style="left:165px; top:300px;">
+    <div class="icon">📦</div><div class="label">ISV App</div><div class="sub">Customer VNet</div>
+    <div class="badge" id="badge-app"></div>
+    <div class="tip">Holds either an OAuth2 client credential or a subscription key — never a raw Foundry/Anthropic key.</div>
+  </div>
+
+  <div class="node c" id="n-pe" style="left:165px; top:480px;">
+    <div class="icon">🔒</div><div class="label">Private Endpoint + NSG</div><div class="sub">Private Link path only</div>
+    <div class="tip">A single private NIC in the customer's own subnet. No peering, no route exchange, no shared address space.</div>
+  </div>
+
+  <div class="node p" id="n-entra" style="left:650px; top:120px;">
+    <div class="icon">🗝️</div><div class="label">Provider Entra ID</div><div class="sub">Same-tenant identity</div>
+    <div class="tip">Issues the OAuth2 token to the app, validates it at the gateway, and issues the gateway's managed-identity token — all same-tenant.</div>
+  </div>
+
+  <div class="node p" id="n-apim" style="left:650px; top:300px;">
+    <div class="icon">🛡️</div><div class="label">API Gateway</div><div class="sub">Azure API Management</div>
+    <div class="badge" id="badge-apim"></div>
+    <div class="tip">Identity terminates here. Validates the front-door credential, enforces per-client quota, forwards via managed identity.</div>
+  </div>
+
+  <div class="node p" id="n-monitor" style="left:650px; top:480px;">
+    <div class="icon">📊</div><div class="label">Azure Monitor</div><div class="sub">Token metrics (async)</div>
+    <div class="tip">Chargeback metrics emitted asynchronously — never blocks the response back to the caller.</div>
+  </div>
+
+  <div class="node p" id="n-foundry" style="left:960px; top:300px;">
+    <div class="icon">🧠</div><div class="label">Microsoft Foundry</div><div class="sub">Claude deployment</div>
+    <div class="tip">Same-tenant private endpoint from the gateway. Public network access disabled.</div>
+  </div>
+
+  <div class="node a" id="n-anthropic" style="left:1250px; top:300px;">
+    <div class="icon">☁️</div><div class="label">Anthropic</div><div class="sub">Claude inference</div>
+    <div class="tip">Third-party, Anthropic-operated. Neither the app nor the gateway ever call Anthropic directly.</div>
+  </div>
+
+  <circle id="packet" r="8" cx="165" cy="120" fill="#8fe3ff"></circle>
+  <svg style="position:absolute; left:0; top:0; width:1360px; height:620px; overflow:visible; pointer-events:none;">
+    <circle id="sidepacket" r="6" cx="0" cy="0" fill="#c07bff" opacity="0"></circle>
+  </svg>
+</div>
+</div>
+
+<div class="hud">
+  <div class="progress-row">
+    <div class="progress-track"><div class="progress-fill" id="progress"></div></div>
+    <div class="step-count" id="stepcount">Ready</div>
+  </div>
+  <div class="caption" id="caption"><span class="tag req">Ready</span><span>Press <b>Play flow</b> to animate the call, end to end.</span></div>
+  <div class="legend">
+    <span><span class="dot" style="background:#3ba7ff"></span>Request path</span>
+    <span><span class="dot" style="background:#2fe0a8"></span>Response path</span>
+    <span><span class="dot" style="background:#c07bff"></span>Async / non-blocking</span>
+    <span><span class="dot" style="background:#ff9d3d"></span>Anthropic (third party)</span>
+  </div>
+</div>
+
+<footer>Cross-Tenant AI Gateway · interactive call-flow reference · open directly in any modern browser, no server required</footer>
+
+<script>
+const state = { auth: 'oauth', conn: 'pl', playing: false };
+
+const nodes = {
+  user:{x:165,y:120,cls:'c'}, app:{x:165,y:300,cls:'c'}, pe:{x:165,y:480,cls:'c'},
+  entra:{x:650,y:120,cls:'p'}, apim:{x:650,y:300,cls:'p'}, monitor:{x:650,y:480,cls:'p'},
+  foundry:{x:960,y:300,cls:'p'}, anthropic:{x:1250,y:300,cls:'a'}
+};
+
+function el(id){ return document.getElementById(id); }
+function nodeEl(key){ return el('n-'+key); }
+
+function setActiveNode(key, on){
+  const n = nodeEl(key); if(!n) return;
+  n.classList.toggle('active', !!on);
+  n.classList.toggle(nodes[key].cls, true);
+}
+function clearActiveNodes(){ Object.keys(nodes).forEach(k=>nodeEl(k).classList.remove('active')); }
+
+function setConnState(id, activeClass){
+  const c = el(id);
+  el ? null : null;
+  document.querySelectorAll('.connector').forEach(p=>p.classList.remove('active-c','active-p','active-a'));
+  if(c && activeClass) c.classList.add(activeClass);
+}
+
+function refreshTopology(){
+  const pe = nodeEl('pe');
+  const lPeApim = el('l-pe-apim');
+  const lAppApimPub = el('l-app-apim-pub');
+  const lAppPe = el('l-app-pe');
+  if(state.conn === 'pl'){
+    pe.classList.remove('dim'); lPeApim.classList.remove('hide'); lAppPe.classList.remove('hide');
+    lAppApimPub.classList.add('hide');
+  } else {
+    pe.classList.add('dim'); lPeApim.classList.add('hide'); lAppPe.classList.add('hide');
+    lAppApimPub.classList.remove('hide');
+  }
+}
+
+el('btn-oauth').onclick = ()=>{ if(state.playing) return; state.auth='oauth'; el('btn-oauth').classList.add('active'); el('btn-key').classList.remove('active'); };
+el('btn-key').onclick   = ()=>{ if(state.playing) return; state.auth='key'; el('btn-key').classList.add('active'); el('btn-oauth').classList.remove('active'); };
+el('btn-pl').onclick    = ()=>{ if(state.playing) return; state.conn='pl'; el('btn-pl').classList.add('active'); el('btn-pub').classList.remove('active'); refreshTopology(); };
+el('btn-pub').onclick   = ()=>{ if(state.playing) return; state.conn='pub'; el('btn-pub').classList.add('active'); el('btn-pl').classList.remove('active'); refreshTopology(); };
+el('btn-reset').onclick = ()=>resetStage();
+
+refreshTopology();
+
+function lerp(a,b,t){ return a+(b-a)*t; }
+function easeInOut(t){ return t<.5 ? 2*t*t : 1-Math.pow(-2*t+2,2)/2; }
+
+function movePacket(from, to, ms, color){
+  return new Promise(resolve=>{
+    const p = el('packet'); p.setAttribute('fill', color);
+    const start = performance.now();
+    function frame(now){
+      const t = Math.min(1,(now-start)/ms);
+      const e = easeInOut(t);
+      p.setAttribute('cx', lerp(from.x, to.x, e));
+      p.setAttribute('cy', lerp(from.y, to.y, e));
+      if(t<1) requestAnimationFrame(frame); else resolve();
+    }
+    requestAnimationFrame(frame);
+  });
+}
+
+function sideTrip(from, to, ms, color){
+  return new Promise(resolve=>{
+    const p = el('sidepacket'); p.setAttribute('fill', color); p.setAttribute('opacity','1');
+    const start = performance.now(); const half = ms/2;
+    function frame(now){
+      const dt = now-start;
+      let t, a=from, b=to;
+      if(dt < half){ t = dt/half; }
+      else { t = (dt-half)/half; a = to; b = from; }
+      const e = easeInOut(Math.min(1,t));
+      p.setAttribute('cx', lerp(a.x,b.x,e));
+      p.setAttribute('cy', lerp(a.y,b.y,e));
+      if(dt < ms) requestAnimationFrame(frame); else { p.setAttribute('opacity','0'); resolve(); }
+    }
+    requestAnimationFrame(frame);
+  });
+}
+
+function badge(id, text, ms){
+  const b = el(id); b.textContent = text; b.classList.add('show');
+  setTimeout(()=>b.classList.remove('show'), ms);
+}
+
+function setCaption(tagClass, tagText, text, stepNum, stepTotal){
+  el('caption').innerHTML = `<span class="tag ${tagClass}">${tagText}</span><span>${text}</span>`;
+  el('stepcount').textContent = `Step ${stepNum} / ${stepTotal}`;
+  el('progress').style.width = (stepNum/stepTotal*100)+'%';
+}
+
+function connectorForSegment(a,b){
+  const map = {
+    'user-app':'l-user-app', 'app-pe':'l-app-pe', 'pe-apim': state.conn==='pl' ? 'l-pe-apim' : null,
+    'app-apim': state.conn==='pub' ? 'l-app-apim-pub' : null,
+    'apim-entra':'l-apim-entra', 'apim-foundry':'l-apim-foundry', 'foundry-anthropic':'l-foundry-anthropic',
+    'apim-monitor':'l-apim-monitor'
+  };
+  return map[a+'-'+b] || map[b+'-'+a];
+}
+
+async function runStep({from,to,color,activeCls,label,tag,tagText,dwell=140}){
+  clearActiveNodes();
+  setActiveNode(from,true); setActiveNode(to,true);
+  const connId = connectorForSegment(from,to);
+  setConnState(connId, activeCls);
+  await movePacket(nodes[from], nodes[to], 900, color);
+  if(dwell) await new Promise(r=>setTimeout(r,dwell));
+}
+
+function resetStage(){
+  state.playing = false;
+  el('btn-play').disabled = false;
+  clearActiveNodes();
+  setConnState(null,null);
+  el('packet').setAttribute('cx', nodes.user.x);
+  el('packet').setAttribute('cy', nodes.user.y);
+  el('progress').style.width='0%';
+  el('stepcount').textContent='Ready';
+  setCaption('req','Ready','Press <b>Play flow</b> to animate the call, end to end.',0,1);
+  [el('btn-oauth'),el('btn-key'),el('btn-pl'),el('btn-pub')].forEach(b=>b.disabled=false);
+}
+
+async function playFlow(){
+  if(state.playing) return;
+  state.playing = true;
+  el('btn-play').disabled = true;
+  [el('btn-oauth'),el('btn-key'),el('btn-pl'),el('btn-pub')].forEach(b=>b.disabled=true);
+
+  const entryHop = state.conn==='pl' ? ['app','pe','apim'] : ['app','apim'];
+  const entryLabel = state.conn==='pl'
+    ? 'Traversing the Private Endpoint — Private Link, over Microsoft\'s backbone, NAT applied. No VNet peering involved.'
+    : 'Going straight to the public gateway endpoint — TLS 1.2+, restricted by IP allow-list.';
+
+  const total = 10;
+  let i=0;
+
+  // Step 1
+  i++; setCaption('req','1 · Originate','The call originates at the <b>End User</b>, inside the customer\'s app.',i,total);
+  await runStep({from:'user',to:'app',color:'#3ba7ff',activeCls:'active-c',dwell:250});
+
+  // Step 2 - auth badge/side-trip
+  i++;
+  if(state.auth==='oauth'){
+    setCaption('req','2 · Authenticate','ISV App requests an app-only <b>OAuth2 token</b> from Provider Entra ID (client_credentials) — a side call, no user involved.',i,total);
+    setActiveNode('app',true); setActiveNode('entra',true);
+    await sideTrip(nodes.app, nodes.entra, 1100, '#c07bff');
+    badge('badge-app','JWT',1400);
+  } else {
+    setCaption('req','2 · Authenticate','ISV App attaches a static <b>subscription key</b> header — no token exchange needed.',i,total);
+    badge('badge-app','KEY',1200);
+    await new Promise(r=>setTimeout(r,700));
+  }
+
+  // Step 3 - cross boundary
+  i++; setCaption('req','3 · Cross the boundary', entryLabel, i, total);
+  if(state.conn==='pl'){
+    await runStep({from:'app',to:'pe',color:'#3ba7ff',activeCls:'active-c',dwell:80});
+    await runStep({from:'pe',to:'apim',color:'#3ba7ff',activeCls:'active-c',dwell:200});
+  } else {
+    await runStep({from:'app',to:'apim',color:'#ffb020',activeCls:'active-c',dwell:200});
+  }
+
+  // Step 4 - validate at gateway
+  i++; setCaption('req','4 · Validate',
+    state.auth==='oauth' ? 'Gateway validates the JWT (issuer, audience, claims) against Provider Entra ID.' : 'Gateway checks the subscription key against the client\'s product.',
+    i,total);
+  badge('badge-apim','CHECK',1200);
+  setActiveNode('apim',true); setActiveNode('entra', state.auth==='oauth');
+  if(state.auth==='oauth'){ await sideTrip(nodes.apim, nodes.entra, 900, '#3ba7ff'); } else { await new Promise(r=>setTimeout(r,700)); }
+
+  // Step 5 - managed identity back door
+  i++; setCaption('req','5 · Managed identity','Gateway fetches its own <b>managed-identity token</b> for Foundry — a same-tenant hop, no cross-tenant AAD involved.',i,total);
+  await sideTrip(nodes.apim, nodes.entra, 1000, '#2fe0a8');
+
+  // Step 6 - to foundry
+  i++; setCaption('req','6 · Forward','Request forwarded to <b>Microsoft Foundry</b> over a same-tenant private endpoint.',i,total);
+  await runStep({from:'apim',to:'foundry',color:'#2fe0a8',activeCls:'active-p',dwell:200});
+
+  // Step 7 - to anthropic
+  i++; setCaption('model','7 · Model call','Foundry routes the request to <b>Anthropic\'s Claude</b> inference service.',i,total);
+  await runStep({from:'foundry',to:'anthropic',color:'#ff9d3d',activeCls:'active-a',dwell:250});
+
+  // Step 8 - response back to foundry/apim
+  i++; setCaption('resp','8 · Response','Completion streams back: Anthropic → Foundry → Gateway.',i,total);
+  await runStep({from:'anthropic',to:'foundry',color:'#2fe0a8',activeCls:'active-a',dwell:80});
+  await runStep({from:'foundry',to:'apim',color:'#2fe0a8',activeCls:'active-p',dwell:150});
+
+  // Step 9 - async metering fork
+  i++; setCaption('async','9 · Async metering','Gateway emits token metrics to <b>Azure Monitor</b> — asynchronous, does not delay the reply.',i,total);
+  setActiveNode('monitor',true);
+  sideTrip(nodes.apim, nodes.monitor, 900, '#c07bff');
+  await new Promise(r=>setTimeout(r,300));
+
+  // Step 10 - back to user
+  i++; setCaption('resp','10 · Deliver','Response crosses back over the same path to the <b>ISV App</b> and the <b>End User</b>.',i,total);
+  if(state.conn==='pl'){
+    await runStep({from:'apim',to:'pe',color:'#2fe0a8',activeCls:'active-c',dwell:80});
+    await runStep({from:'pe',to:'app',color:'#2fe0a8',activeCls:'active-c',dwell:80});
+  } else {
+    await runStep({from:'apim',to:'app',color:'#2fe0a8',activeCls:'active-c',dwell:80});
+  }
+  await runStep({from:'app',to:'user',color:'#2fe0a8',activeCls:'active-c',dwell:200});
+
+  setCaption('resp','Complete','Flow complete — end to end, one round trip.',total,total);
+  clearActiveNodes(); setConnState(null,null);
+  state.playing = false;
+  el('btn-play').disabled = false;
+  [el('btn-oauth'),el('btn-key'),el('btn-pl'),el('btn-pub')].forEach(b=>b.disabled=false);
+}
+
+el('btn-play').onclick = playFlow;
+</script>
+</body>
+</html>

@@ -14,3 +14,5 @@
 | 2 | [diagrams/02-network-architecture.png](diagrams/02-network-architecture.png) | Network-layer view: your app → gateway → Foundry → Anthropic, the no-peering constraint, and both connectivity paths. |
 
 Each PNG has an editable `.drawio` source of the same name in the same folder — open with the draw.io VS Code extension, desktop app, or app.diagrams.net.
+
+**[diagrams/network-architecture-live.html](diagrams/network-architecture-live.html)** — an interactive, animated version of the network diagram. Open it directly in any browser (no server needed) and hit **Play flow** to watch the call originate at the end user, cross the tenant boundary, and traverse every component through to Anthropic and back. Toggle Path 1/Path 2 and Private Link/Public endpoint live.
