@@ -24,21 +24,80 @@ What does **not** work, and shouldn't be attempted: using a managed identity fro
 
 ## The recommended shape
 
-Don't let the ISV Platform call Foundry/Anthropic directly with a raw API key baked into the customer environment. Put **Azure API Management (APIM) in front of Foundry, inside the Provider Tenant**, acting as an AI gateway:
+Don't let the ISV Platform call Foundry/Anthropic directly with a raw API key baked into the customer environment. Put **Azure API Management (APIM) in front of Foundry, inside the Provider Tenant**, acting as an AI gateway.
+
+The compressed one-line version of the flow (`ISV Platform --HTTPS + OAuth2--> APIM --managed identity--> Foundry --> Anthropic`) hides the one step people usually get stuck on: **where does the OAuth2 token in that first hop actually come from, and who issues it?** The expanded flow below spells that out.
 
 ```
-Customer Tenant                    Cross-Tenant Boundary                  Provider Tenant
-────────────────                   ──────────────────────                 ───────────────
-ISV Platform  ──HTTPS + OAuth2──▶  Private Link (or public+allow-list) ──▶ Azure API Management (v2 tier)
-                                                                                │  authentication-managed-identity
-                                                                                ▼  (same-tenant hop)
-                                                                           Microsoft Foundry — Claude deployment
-                                                                                │
-                                                                                ▼
-                                                                           Anthropic-operated inference
+CUSTOMER TENANT                                    CROSS-TENANT BOUNDARY                  PROVIDER TENANT
+────────────────                                   ──────────────────────                 ───────────────
+
+  End User
+    │ signs in with the CUSTOMER's own Entra ID
+    │ (app-level authZ only - proves nothing about model access)
+    ▼
+┌───────────────┐
+│  ISV Platform  │
+└───────────────┘
+    │ (a) BEFORE calling the gateway, the ISV Platform requests its own
+    │     app-only access token - a service-to-service call, no user involved:
+    │       POST https://login.microsoftonline.com/{PROVIDER-tenant-id}/oauth2/v2.0/token
+    │       grant_type=client_credentials, client_id + client_secret
+    │     That client_id/secret was issued by the PROVIDER to THIS client during
+    │     onboarding, and is stored in the CUSTOMER's own Key Vault. It has nothing
+    │     to do with the end user or the customer's Entra tenant.
+    ▼
+    ⇄   Provider Entra ID (token endpoint) - validates the client_id/secret,
+        signs and returns a JWT scoped to the gateway (audience = gateway app)
+    │
+    │ (b) ISV Platform now calls the gateway, presenting that JWT:
+    │       HTTPS request, header  Authorization: Bearer <JWT from step a>
+    │       over Private Link, or a public endpoint + IP allow-list
+    ▼
+                                            ═══════════▶
+                                                           ┌─────────────────────────────┐
+                                                           │ Azure API Management (v2)     │
+                                                           │  validate-jwt checks the JWT's │
+                                                           │  signature / issuer / audience │
+                                                           │  against PROVIDER Entra ID -    │
+                                                           │  proves "this is a specific      │
+                                                           │  onboarded client", not just      │
+                                                           │  anyone on the internet, and      │
+                                                           │  resolves the caller to a per-    │
+                                                           │  client product/quota             │
+                                                           └─────────────────────────────┘
+                                                                       │ (c) authentication-managed-identity:
+                                                                       │     APIM's OWN managed identity asks
+                                                                       │     PROVIDER Entra ID (SAME tenant)
+                                                                       │     for a token scoped to Foundry
+                                                                       ▼
+                                                           ┌─────────────────────────────┐
+                                                           │ Microsoft Foundry              │
+                                                           │ Claude deployment               │
+                                                           └─────────────────────────────┘
+                                                                       │ (d) Foundry's own internal routing to
+                                                                       │     Anthropic, billed against the
+                                                                       │     PROVIDER's Marketplace subscription -
+                                                                       │     not a hop the ISV Platform or APIM
+                                                                       │     authenticate separately
+                                                                       ▼
+                                                           ┌─────────────────────────────┐
+                                                           │ Anthropic-operated inference    │
+                                                           └─────────────────────────────┘
 ```
 
-See [diagrams/01-solution-architecture-overview.png](../diagrams/01-solution-architecture-overview.png) for the full layered view and [diagrams/02-cross-tenant-request-and-token-flow.png](../diagrams/02-cross-tenant-request-and-token-flow.png) for the numbered, component-level flow.
+### Four hops, four different credentials — none of them reused across the boundary
+
+| Hop | Credential used | Issued by | What it proves |
+|---|---|---|---|
+| End User → ISV Platform | Customer Entra ID sign-in | Customer Tenant | This user may use the app. Nothing about model access. |
+| **ISV Platform → APIM** (step a+b above) | OAuth2 client-credentials JWT (app-only, or a subscription key) | **Provider Tenant** Entra ID — a service-to-service token, no user identity involved at all | This is a specific client the provider onboarded, entitled to call the gateway. This is the hop people usually assume must be "the user's identity" or "a managed identity" — it's neither. |
+| APIM → Foundry (step c) | Managed identity token | Provider Tenant Entra ID (same tenant as APIM) | This call is coming from the provider's own trusted gateway resource. Works because both APIM and Foundry live in the Provider Tenant. |
+| Foundry → Anthropic (step d) | None exposed to any caller | Microsoft Foundry's own internal integration | Consumption is billed against the provider's Anthropic Marketplace subscription. Neither the ISV Platform nor APIM ever talk to Anthropic directly. |
+
+The key point to internalize: **step (a) is a pre-flight, app-only token request the ISV Platform makes to the Provider Tenant's Entra ID *before* it ever calls the gateway.** That's the piece that's easy to miss when the flow is compressed to one line — it's what "authenticates" the front-door hop, and it's a completely separate credential from the managed identity APIM later uses to reach Foundry.
+
+See [diagrams/01-solution-architecture-overview.png](../diagrams/01-solution-architecture-overview.png) for the full layered view, [diagrams/02-cross-tenant-request-and-token-flow.png](../diagrams/02-cross-tenant-request-and-token-flow.png) for the numbered, component-level flow, and [diagrams/04-identity-and-token-sequence.png](../diagrams/04-identity-and-token-sequence.png) for the complete 14-step sequence including this token-acquisition step explicitly.
 
 ## Why the gateway, specifically
 
