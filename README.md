@@ -35,27 +35,27 @@ policies/   Ready-to-adapt Azure API Management policy XML for the gateway
 
 | # | File | What it shows |
 |---|------|----------------|
-| 1 | [diagrams/01-solution-architecture-overview.png](../diagrams/01-solution-architecture-overview.png) | Full-picture grid: identity, network, AI platform, commercial, and governance layers across the three zones (Customer Tenant / Cross-Tenant Boundary / Provider Tenant). Start here. |
-| 2 | [diagrams/02-cross-tenant-request-and-token-flow.png](../diagrams/02-cross-tenant-request-and-token-flow.png) | Detailed, numbered (1–10) component flow from end user to Anthropic and back to billing. |
-| 3 | [diagrams/03-networking-and-private-link.png](../diagrams/03-networking-and-private-link.png) | Network-level detail: VNets, subnets, NSGs, cross-tenant Private Endpoint approval workflow, DNS, NAT behavior, and the public-endpoint alternative. |
-| 4 | [diagrams/04-identity-and-token-sequence.png](../diagrams/04-identity-and-token-sequence.png) | Actor-by-actor sequence diagram (14 steps) showing exactly which credential is used at each hop. |
-| 5 | [diagrams/05-commercial-options-comparison.png](../diagrams/05-commercial-options-comparison.png) | Option A (provider-owned Foundry) vs. Option B (customer-owned Foundry) side by side, including the billing and contracting differences. |
-| 6 | [diagrams/06-animated-call-flow.png](../diagrams/06-animated-call-flow.png) | Simplified live-call diagram with animated (pulsing) edges showing request, response, and async metering paths in real time. |
+| 1 | [diagrams/01-solution-architecture-overview.png](diagrams/01-solution-architecture-overview.png) | Full-picture grid: identity, network, AI platform, commercial, and governance layers across the three zones (Customer Tenant / Cross-Tenant Boundary / Provider Tenant). Start here. |
+| 2 | [diagrams/02-cross-tenant-request-and-token-flow.png](diagrams/02-cross-tenant-request-and-token-flow.png) | Detailed, numbered (1–10) component flow from end user to Anthropic and back to billing. |
+| 3 | [diagrams/03-networking-and-private-link.png](diagrams/03-networking-and-private-link.png) | Network-level detail: VNets, subnets, NSGs, cross-tenant Private Endpoint approval workflow, DNS, NAT behavior, and the public-endpoint alternative. |
+| 4 | [diagrams/04-identity-and-token-sequence.png](diagrams/04-identity-and-token-sequence.png) | Actor-by-actor sequence diagram (14 steps) showing exactly which credential is used at each hop. |
+| 5 | [diagrams/05-commercial-options-comparison.png](diagrams/05-commercial-options-comparison.png) | Option A (provider-owned Foundry) vs. Option B (customer-owned Foundry) side by side, including the billing and contracting differences. |
+| 6 | [diagrams/06-animated-call-flow.png](diagrams/06-animated-call-flow.png) | Simplified live-call diagram with animated (pulsing) edges showing request, response, and async metering paths in real time. |
 
 Each PNG has an editable `.drawio` source of the same name in the same folder — open that in draw.io to modify it.
 
-See [docs/08-diagrams-index.md](../docs/08-diagrams-index.md) for how to open and animate the editable sources.
+See [docs/08-diagrams-index.md](docs/08-diagrams-index.md) for how to open and animate the editable sources.
 
 ## Docs (read in order)
 
-1. [docs/01-architecture-overview.md](../docs/01-architecture-overview.md) — the scenario, the viability call, and the recommended shape
-2. [docs/02-identity-and-trust-boundary.md](../docs/02-identity-and-trust-boundary.md) — why managed identity fails cross-tenant, and the front-door/back-door split
-3. [docs/03-networking-and-private-link.md](../docs/03-networking-and-private-link.md) — connectivity options and cross-tenant Private Link mechanics
-4. [docs/04-commercial-models.md](../docs/04-commercial-models.md) — Option A vs Option B, and when each applies
-5. [docs/05-apim-gateway-configuration.md](../docs/05-apim-gateway-configuration.md) — concrete policy XML, SKU requirements, and setup steps
-6. [docs/06-implementation-runbook.md](../docs/06-implementation-runbook.md) — step-by-step build checklist
-7. [docs/07-constraints-and-open-risks.md](../docs/07-constraints-and-open-risks.md) — things to reconfirm with your Microsoft/Anthropic account team before committing to a client
-8. [docs/08-diagrams-index.md](../docs/08-diagrams-index.md) — how to open, edit, and animate the diagrams
+1. [docs/01-architecture-overview.md](docs/01-architecture-overview.md) — the scenario, the viability call, and the recommended shape
+2. [docs/02-identity-and-trust-boundary.md](docs/02-identity-and-trust-boundary.md) — why managed identity fails cross-tenant, and the front-door/back-door split
+3. [docs/03-networking-and-private-link.md](docs/03-networking-and-private-link.md) — connectivity options and cross-tenant Private Link mechanics
+4. [docs/04-commercial-models.md](docs/04-commercial-models.md) — Option A vs Option B, and when each applies
+5. [docs/05-apim-gateway-configuration.md](docs/05-apim-gateway-configuration.md) — concrete policy XML, SKU requirements, and setup steps
+6. [docs/06-implementation-runbook.md](docs/06-implementation-runbook.md) — step-by-step build checklist
+7. [docs/07-constraints-and-open-risks.md](docs/07-constraints-and-open-risks.md) — things to reconfirm with your Microsoft/Anthropic account team before committing to a client
+8. [docs/08-diagrams-index.md](docs/08-diagrams-index.md) — how to open, edit, and animate the diagrams
 
 ## What this repo does **not** claim
 
