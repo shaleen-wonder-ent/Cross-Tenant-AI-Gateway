@@ -41,4 +41,4 @@ The customer's Entra ID (or employee identifier) should still be visible for aud
 
 This is the detail that makes both true at once: managed identity genuinely doesn't work cross-tenant (so don't rely on it at the Foundry hop), and a multi-tenant app registration is not "fragile per client" (so use it, just at the gateway hop, terminating there).
 
-See [diagrams/04-identity-and-token-sequence.drawio](../diagrams/04-identity-and-token-sequence.drawio) for the full 14-step sequence, and [docs/05-apim-gateway-configuration.md](05-apim-gateway-configuration.md) for the policy XML that implements this.
+See [diagrams/04-identity-and-token-sequence.png](../diagrams/04-identity-and-token-sequence.png) for the full 14-step sequence, and [docs/05-apim-gateway-configuration.md](05-apim-gateway-configuration.md) for the policy XML that implements this.

@@ -38,7 +38,7 @@ ISV Platform  ──HTTPS + OAuth2──▶  Private Link (or public+allow-list)
                                                                            Anthropic-operated inference
 ```
 
-See [diagrams/01-solution-architecture-overview.drawio](../diagrams/01-solution-architecture-overview.drawio) for the full layered view and [diagrams/02-cross-tenant-request-and-token-flow.drawio](../diagrams/02-cross-tenant-request-and-token-flow.drawio) for the numbered, component-level flow.
+See [diagrams/01-solution-architecture-overview.png](../diagrams/01-solution-architecture-overview.png) for the full layered view and [diagrams/02-cross-tenant-request-and-token-flow.png](../diagrams/02-cross-tenant-request-and-token-flow.png) for the numbered, component-level flow.
 
 ## Why the gateway, specifically
 

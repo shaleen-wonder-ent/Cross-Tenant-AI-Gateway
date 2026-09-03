@@ -44,7 +44,7 @@ Step-by-step checklist to stand up the architecture described in this repo. Each
 - [ ] Confirm token-limit headers are returned and quota is enforced per client (test by exceeding the configured `tokens-per-minute`)
 - [ ] Confirm `Total Tokens` / `Prompt Tokens` / `Completion Tokens` custom metrics appear in Application Insights, dimensioned by `ClientId`
 - [ ] Confirm revocation works: disable a client's credential/subscription and verify the next call is rejected with 401/403
-- [ ] Run a joint walkthrough with the client covering [diagrams/06-animated-call-flow.drawio](../diagrams/06-animated-call-flow.drawio) so the request/response/metering paths are visually clear
+- [ ] Run a joint walkthrough with the client covering [diagrams/06-animated-call-flow.png](../diagrams/06-animated-call-flow.png) so the request/response/metering paths are visually clear
 
 ## Phase 6 — Ongoing operations
 

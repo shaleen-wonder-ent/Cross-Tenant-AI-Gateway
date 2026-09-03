@@ -34,4 +34,4 @@ The client provisions **their own** Foundry account, Claude deployment, and Anth
 | Production, high volume, long-term engagement | **Option B** as the default target — start on Option A if needed, migrate later (the gateway pattern makes this a backend-swap, not a rebuild) |
 | Client is on a CSP subscription | Confirm CSP support for the specific model offer **before** proposing Option B |
 
-See [diagrams/05-commercial-options-comparison.drawio](../diagrams/05-commercial-options-comparison.drawio) for the side-by-side flow, and [docs/07-constraints-and-open-risks.md](07-constraints-and-open-risks.md) for the full list of things to reconfirm before a client commitment.
+See [diagrams/05-commercial-options-comparison.png](../diagrams/05-commercial-options-comparison.png) for the side-by-side flow, and [docs/07-constraints-and-open-risks.md](07-constraints-and-open-risks.md) for the full list of things to reconfirm before a client commitment.

@@ -1,6 +1,6 @@
 # 8. Diagrams Index — How to Open, Edit, and Animate
 
-All diagrams are plain `.drawio` XML files (uncompressed, human-diffable) under [diagrams/](../diagrams/).
+All diagrams are plain `.drawio` XML files (uncompressed, human-diffable) under [diagrams/](../diagrams/). Each one also has a pre-rendered `.png` of the same name in the same folder, for quick viewing without opening draw.io.
 
 ## Opening the diagrams
 
