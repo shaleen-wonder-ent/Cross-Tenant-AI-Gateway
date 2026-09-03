@@ -1,0 +1,54 @@
+1
+00:00:00,000 --> 00:00:02,070
+[Step 1 · Originate]
+The call originates at the End User, inside the customer's app.
+
+2
+00:00:02,070 --> 00:00:04,050
+[Step 2 · Authenticate — Path 1: OAuth2]
+ISV App requests an app-only OAuth2 token from Provider Entra ID (client_credentials) — a side call, no user involved.
+
+3
+00:00:04,050 --> 00:00:07,794
+[Step 3 · Cross the boundary — Private Link]
+Traversing the Private Endpoint — Private Link, over Microsoft's backbone, NAT applied. No VNet peering involved.
+
+4
+00:00:07,794 --> 00:00:09,414
+[Step 4 · Validate — Path 1: OAuth2]
+Gateway validates the JWT (issuer, audience, claims) against Provider Entra ID.
+
+5
+00:00:09,414 --> 00:00:11,214
+[Step 5 · Managed identity]
+Gateway fetches its own managed-identity token for Foundry — a same-tenant hop, no cross-tenant AAD involved.
+
+6
+00:00:11,214 --> 00:00:13,194
+[Step 6 · Forward]
+Request forwarded to Microsoft Foundry over a same-tenant private endpoint.
+
+7
+00:00:13,194 --> 00:00:15,264
+[Step 7 · Model call]
+Foundry routes the request to Anthropic's Claude inference service.
+
+8
+00:00:15,264 --> 00:00:18,918
+[Step 8 · Response]
+Completion streams back: Anthropic to Foundry to Gateway.
+
+9
+00:00:18,918 --> 00:00:19,458
+[Step 9 · Async metering]
+Gateway emits token metrics to Azure Monitor — asynchronous, does not delay the reply.
+
+10
+00:00:19,458 --> 00:00:24,966
+[Step 10 · Deliver]
+Response crosses back over the same path to the ISV App and the End User.
+
+11
+00:00:24,966 --> 00:00:29,966
+[Complete]
+Flow complete — end to end, one round trip.
