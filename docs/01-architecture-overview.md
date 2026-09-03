@@ -37,53 +37,54 @@ CUSTOMER TENANT                                    CROSS-TENANT BOUNDARY        
     │ (app-level authZ only - proves nothing about model access)
     ▼
 ┌───────────────┐
-│  ISV Platform  │
+│ ISV Platform  │
 └───────────────┘
     │ (a) BEFORE calling the gateway, the ISV Platform requests its own
     │     app-only access token - a service-to-service call, no user involved:
     │       POST https://login.microsoftonline.com/{PROVIDER-tenant-id}/oauth2/v2.0/token
     │       grant_type=client_credentials, client_id + client_secret
-    │     That client_id/secret was issued by the PROVIDER to THIS client during
-    │     onboarding, and is stored in the CUSTOMER's own Key Vault. It has nothing
-    │     to do with the end user or the customer's Entra tenant.
+    │     
+    │     That client_id/secret was issued by the PROVIDER to THIS client during onboarding, 
+    │     and is stored in the CUSTOMER's own Key Vault. It has nothing to do with the end user or the customer's Entra tenant.
+    │     
     ▼
-    ⇄   Provider Entra ID (token endpoint) - validates the client_id/secret,
-        signs and returns a JWT scoped to the gateway (audience = gateway app)
+    ⇄   Provider Entra ID (token endpoint) - validates the client_id/secret, signs and returns a JWT scoped to the gateway (audience = gateway app)
+        
     │
     │ (b) ISV Platform now calls the gateway, presenting that JWT:
     │       HTTPS request, header  Authorization: Bearer <JWT from step a>
     │       over Private Link, or a public endpoint + IP allow-list
     ▼
                                             ═══════════▶
-                                                           ┌─────────────────────────────┐
-                                                           │ Azure API Management (v2)     │
-                                                           │  validate-jwt checks the JWT's │
-                                                           │  signature / issuer / audience │
-                                                           │  against PROVIDER Entra ID -    │
-                                                           │  proves "this is a specific      │
+                                                           ┌───────────────────────────────────┐
+                                                           │ Azure API Management (v2)         │
+                                                           │  validate-jwt checks the JWT's    │
+                                                           │  signature / issuer / audience    │
+                                                           │  against PROVIDER Entra ID -      │
+                                                           │  proves "this is a specific       │
                                                            │  onboarded client", not just      │
                                                            │  anyone on the internet, and      │
                                                            │  resolves the caller to a per-    │
                                                            │  client product/quota             │
-                                                           └─────────────────────────────┘
+                                                           └───────────────────────────────────┘
                                                                        │ (c) authentication-managed-identity:
                                                                        │     APIM's OWN managed identity asks
                                                                        │     PROVIDER Entra ID (SAME tenant)
                                                                        │     for a token scoped to Foundry
                                                                        ▼
-                                                           ┌─────────────────────────────┐
+                                                           ┌────────────────────────────────┐
                                                            │ Microsoft Foundry              │
-                                                           │ Claude deployment               │
-                                                           └─────────────────────────────┘
+                                                           │ Claude deployment              │
+                                                           └────────────────────────────────┘
                                                                        │ (d) Foundry's own internal routing to
                                                                        │     Anthropic, billed against the
                                                                        │     PROVIDER's Marketplace subscription -
                                                                        │     not a hop the ISV Platform or APIM
                                                                        │     authenticate separately
                                                                        ▼
-                                                           ┌─────────────────────────────┐
-                                                           │ Anthropic-operated inference    │
-                                                           └─────────────────────────────┘
+                                                           ┌────────────────────────────────┐
+                                                           │ Anthropic-operated inference   │
+                                                           └────────────────────────────────┘
 ```
 
 ### Four hops, four different credentials — none of them reused across the boundary
