@@ -4,7 +4,10 @@ This repository documents a validated architecture for a common ISV/SI pattern:
 
 > An application runs **inside an end-customer's Azure tenant**, but the underlying LLM (Anthropic's Claude models via Microsoft Foundry) is consumed from a **different tenant** — the platform provider's own Azure/EA tenant — because that's where the provider's Anthropic contract and API keys live.
 
-> **Naming convention used throughout this repo:** no company names are used. "Customer Tenant" = the end-customer's Azure/Entra tenant where the application runs. "Provider Tenant" = the platform provider's own Azure/EA tenant that owns the Anthropic-on-Foundry Marketplace subscription. "ISV Platform" = the application/model-routing layer being delivered to the customer.
+> **Naming convention used throughout this repo:** 
+"Customer Tenant" = the end-customer's Azure/Entra tenant where the application runs. 
+"Provider Tenant" = the platform provider's own Azure/EA tenant that owns the Anthropic-on-Foundry Marketplace subscription. 
+"ISV Platform" = the application/model-routing layer being delivered to the customer.
 
 ## Start here
 
