@@ -19,13 +19,23 @@
 
 End-to-end call flow with Path 1 (OAuth2) and Path 2 (subscription key) shown as alternative options into the same gateway.
 
-<img src="diagrams/01-two-options-call-flow.svg" alt="Two front-door options — call flow" width="100%">
+<img style="max-width: 800px; cursor: pointer; border: 1px solid #ddd; padding: 4px;" 
+     alt="Two front-door options — call flow" 
+     src="https://raw.githubusercontent.com/shaleen-wonder-ent/Cross-Tenant-AI-Gateway/refs/heads/main/diagrams/01-two-options-call-flow.svg"
+     onclick="window.open(this.src, 'Image', 'width='+this.naturalWidth+',height='+this.naturalHeight); return false;" />
+<br>
+<em>Click to view full size</em>
 
 ### 2. Network architecture
 
 Network-layer view: your app → gateway → Foundry → Anthropic, the no-peering constraint, and both connectivity paths.
 
-<img src="diagrams/02-network-architecture.svg" alt="Network architecture" width="100%">
+<img style="max-width: 800px; cursor: pointer; border: 1px solid #ddd; padding: 4px;" 
+     alt="Two front-door options — call flow" 
+     src="https://raw.githubusercontent.com/shaleen-wonder-ent/Cross-Tenant-AI-Gateway/refs/heads/main/diagrams/02-network-architecture.svg"
+     onclick="window.open(this.src, 'Image', 'width='+this.naturalWidth+',height='+this.naturalHeight); return false;" />
+<br>
+<em>Click to view full size</em>
 
 Each SVG has an editable `.drawio` source of the same name in the same folder — open with the draw.io VS Code extension, desktop app, or app.diagrams.net.
 
