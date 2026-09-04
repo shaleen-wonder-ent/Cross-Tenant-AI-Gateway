@@ -10,6 +10,28 @@ Your App (Your Tenant)  --calls-->  Gateway (Provider Tenant)  --calls-->  Micro
 
 Only the first hop — how your app authenticates to the gateway — changes between the two paths below. Everything after the gateway is identical either way, and is entirely on the provider's side.
 
+## Tenant ownership and provisioning
+
+This guide uses two separate Microsoft Entra tenants:
+
+| Tenant | Tenant ID | Provisioned and owned by |
+|---|---|---|
+| Customer tenant | `<customer-tenant-id>` | Customer workload and client identity |
+| Provider tenant | `<provider-tenant-id>` | APIM, Microsoft Foundry, and provider API identity |
+
+The provider provisions APIM and Microsoft Foundry in the **provider tenant**. The provider also creates the multitenant Entra app registration that represents the protected APIM API. That API app registration exposes an application permission such as `Model.Invoke`.
+
+The customer creates the client app registration in the **customer tenant**. For the client-credentials flow, this app is normally single-tenant, has no redirect URI, and uses a certificate, federated credential, or temporary client secret. The customer grants consent to the provider API permission in the customer tenant.
+
+The provider should give the customer the provider API application ID, Application ID URI, required application permission, APIM hostname, and network requirements. The customer should provide the customer tenant ID, client application ID, and approved egress or Private Link details. Consent creates an enterprise application/service principal for the provider API in the customer tenant; it does not move or duplicate the provider's API app registration.
+
+In short:
+
+```text
+Provider tenant:  multitenant provider API app registration + APIM + Microsoft Foundry
+Customer tenant:  single-tenant customer client app registration + consented provider service principal
+```
+
 ## Path 1 — OAuth2 client-credentials
 
 Your app requests a short-lived access token from the provider's identity system (app-only, no end-user involved) and presents it to the gateway.
