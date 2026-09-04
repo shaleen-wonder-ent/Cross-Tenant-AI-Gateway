@@ -6,7 +6,7 @@ The call originates at the End User, inside the customer's app.
 2
 00:00:02,070 --> 00:00:04,050
 [Step 2 · Authenticate — Path 1: OAuth2]
-ISV App requests an app-only OAuth2 token from Provider Entra ID (client_credentials) — a side call, no user involved.
+Customer App requests an app-only OAuth2 token from the customer's own Entra ID (client_credentials) — a side call, no user involved.
 
 3
 00:00:04,050 --> 00:00:07,794
@@ -16,7 +16,7 @@ Traversing the Private Endpoint — Private Link, over Microsoft's backbone, NAT
 4
 00:00:07,794 --> 00:00:09,414
 [Step 4 · Validate — Path 1: OAuth2]
-Gateway validates the JWT (issuer, audience, claims) against Provider Entra ID.
+Gateway validates the JWT (issuer, audience, claims) — the token was issued by the customer's Entra ID.
 
 5
 00:00:09,414 --> 00:00:11,214
@@ -46,7 +46,7 @@ Gateway emits token metrics to Azure Monitor — asynchronous, does not delay th
 10
 00:00:19,458 --> 00:00:24,966
 [Step 10 · Deliver]
-Response crosses back over the same path to the ISV App and the End User.
+Response crosses back over the same path to the Customer App and the End User.
 
 11
 00:00:24,966 --> 00:00:29,966

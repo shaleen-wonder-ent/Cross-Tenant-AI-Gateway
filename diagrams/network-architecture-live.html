@@ -207,7 +207,7 @@
   </div>
 
   <div class="node c" id="n-app" style="left:165px; top:300px;">
-    <div class="icon">📦</div><div class="label">ISV App</div><div class="sub">Customer VNet</div>
+    <div class="icon">📦</div><div class="label">Customer App</div><div class="sub">Customer VNet</div>
     <div class="badge" id="badge-app"></div>
     <div class="tip">Holds either an OAuth2 client credential or a subscription key — never a raw Foundry/Anthropic key.</div>
   </div>
@@ -218,8 +218,8 @@
   </div>
 
   <div class="node p" id="n-entra" style="left:650px; top:120px;">
-    <div class="icon">🗝️</div><div class="label">Provider Entra ID</div><div class="sub">Same-tenant identity</div>
-    <div class="tip">Issues the OAuth2 token to the app, validates it at the gateway, and issues the gateway's managed-identity token — all same-tenant.</div>
+    <div class="icon">🗝️</div><div class="label">Provider Entra ID</div><div class="sub">Provider tenant · gateway MI</div>
+    <div class="tip">Issues the gateway's <b>managed-identity token</b> for Foundry (provider tenant). The customer's OAuth2 token is issued by the <b>customer's own Entra ID</b> and validated here at the gateway.</div>
   </div>
 
   <div class="node p" id="n-apim" style="left:650px; top:300px;">
@@ -441,12 +441,12 @@ async function playFlow(){
   // Step 2 - auth badge/side-trip
   i++;
   if(state.auth==='oauth'){
-    setCaption('req','2 · Authenticate','ISV App requests an app-only <b>OAuth2 token</b> from Provider Entra ID (client_credentials) — a side call, no user involved.',i,total);
-    setActiveNode('app',true); setActiveNode('entra',true);
-    await sideTrip(nodes.app, nodes.entra, 1100, '#c07bff');
+    setCaption('req','2 · Authenticate','Customer App requests an app-only <b>OAuth2 token</b> from the <b>customer\'s own Entra ID</b> (client_credentials) — a side call, no user involved.',i,total);
+    setActiveNode('app',true);
     badge('badge-app','JWT',1400);
+    await pausableDelay(1100);
   } else {
-    setCaption('req','2 · Authenticate','ISV App attaches a static <b>subscription key</b> header — no token exchange needed.',i,total);
+    setCaption('req','2 · Authenticate','Customer App attaches a static <b>subscription key</b> header — no token exchange needed.',i,total);
     badge('badge-app','KEY',1200);
     await pausableDelay(700);
   }
@@ -462,14 +462,15 @@ async function playFlow(){
 
   // Step 4 - validate at gateway
   i++; setCaption('req','4 · Validate',
-    state.auth==='oauth' ? 'Gateway validates the JWT (issuer, audience, claims) against Provider Entra ID.' : 'Gateway checks the subscription key against the client\'s product.',
+    state.auth==='oauth' ? 'Gateway validates the JWT (issuer, audience, claims) — the token was issued by the <b>customer\'s Entra ID</b>.' : 'Gateway checks the subscription key against the client\'s product.',
     i,total);
   badge('badge-apim','CHECK',1200);
-  setActiveNode('apim',true); setActiveNode('entra', state.auth==='oauth');
-  if(state.auth==='oauth'){ await sideTrip(nodes.apim, nodes.entra, 900, '#3ba7ff'); } else { await pausableDelay(700); }
+  setActiveNode('apim',true);
+  await pausableDelay(state.auth==='oauth' ? 900 : 700);
 
   // Step 5 - managed identity back door
   i++; setCaption('req','5 · Managed identity','Gateway fetches its own <b>managed-identity token</b> for Foundry — a same-tenant hop, no cross-tenant AAD involved.',i,total);
+  setActiveNode('entra',true);
   await sideTrip(nodes.apim, nodes.entra, 1000, '#2fe0a8');
 
   // Step 6 - to foundry
@@ -492,7 +493,7 @@ async function playFlow(){
   await pausableDelay(300);
 
   // Step 10 - back to user
-  i++; setCaption('resp','10 · Deliver','Response crosses back over the same path to the <b>ISV App</b> and the <b>End User</b>.',i,total);
+  i++; setCaption('resp','10 · Deliver','Response crosses back over the same path to the <b>Customer App</b> and the <b>End User</b>.',i,total);
   if(state.conn==='pl'){
     await runStep({from:'apim',to:'pe',color:'#2fe0a8',activeCls:'active-c',dwell:80});
     await runStep({from:'pe',to:'app',color:'#2fe0a8',activeCls:'active-c',dwell:80});
