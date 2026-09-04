@@ -1,0 +1,18 @@
+# Local, not-for-repo POC infrastructure (kept on local machine only)
+poc-terraform/
+
+# Terraform (belt-and-suspenders in case files move outside poc-terraform/)
+**/.terraform/*
+*.tfstate
+*.tfstate.*
+crash.log
+crash.*.log
+*.tfvars
+!*.tfvars.example
+.terraform.lock.hcl
+override.tf
+override.tf.json
+*_override.tf
+*_override.tf.json
+.terraformrc
+terraform.rc
