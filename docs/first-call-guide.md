@@ -48,6 +48,11 @@ You can start on Path 2 for a pilot and move to Path 1 later — nothing past th
 
 Either way, the gateway's own connection to Foundry stays entirely inside the provider's tenant and isn't part of this decision.
 
+Detailed setup and request flows:
+
+- **[Private Link networking guide](private-link-networking.md)** — tenant ownership, private endpoint approval, private DNS, Entra/JWT validation, and the APIM managed-identity hop to Foundry.
+- **[Public endpoint networking guide](public-endpoint-networking.md)** — stable customer egress, IP allow-listing, TLS, Entra/JWT validation, and the same managed-identity hop to Foundry.
+
 For the call itself, open [diagrams/network-architecture-live.html](../diagrams/network-architecture-live.html) in a browser and hit **Play flow** — it animates the call originating at the end user, crossing the boundary, and traversing every component through to Anthropic and back, with Path 1/2 and Private Link/Public toggles.
 
 ## Constraints to plan for

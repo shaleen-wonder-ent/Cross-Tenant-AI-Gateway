@@ -6,6 +6,13 @@
 
 **[docs/first-call-guide.md](docs/first-call-guide.md)** — the two implementation paths (OAuth2 client-credentials vs. subscription key), what to know about each, the networking approach, and the constraints to plan for.
 
+## Detailed networking guides
+
+| Option | Guide | What it covers |
+|---|---|---|
+| Private Link | [docs/private-link-networking.md](docs/private-link-networking.md) | Cross-tenant private endpoint approval, private DNS, Entra/JWT validation at APIM, and managed identity from APIM to Foundry. |
+| Public endpoint | [docs/public-endpoint-networking.md](docs/public-endpoint-networking.md) | Stable customer egress, IP allow-listing, TLS, Entra/JWT validation at APIM, and managed identity from APIM to Foundry. |
+
 ## Diagrams
 
 | # | File | What it shows |
