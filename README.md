@@ -15,10 +15,17 @@
 
 ## Diagrams
 
-| # | File | What it shows |
-|---|------|----------------|
-| 1 | [diagrams/01-two-options-call-flow.svg](diagrams/01-two-options-call-flow.svg) | End-to-end call flow with Path 1 (OAuth2) and Path 2 (subscription key) shown as alternative options into the same gateway. |
-| 2 | [diagrams/02-network-architecture.svg](diagrams/02-network-architecture.svg) | Network-layer view: your app → gateway → Foundry → Anthropic, the no-peering constraint, and both connectivity paths. |
+### 1. Two front-door options — call flow
+
+End-to-end call flow with Path 1 (OAuth2) and Path 2 (subscription key) shown as alternative options into the same gateway.
+
+<img src="diagrams/01-two-options-call-flow.svg" alt="Two front-door options — call flow" width="100%">
+
+### 2. Network architecture
+
+Network-layer view: your app → gateway → Foundry → Anthropic, the no-peering constraint, and both connectivity paths.
+
+<img src="diagrams/02-network-architecture.svg" alt="Network architecture" width="100%">
 
 Each SVG has an editable `.drawio` source of the same name in the same folder — open with the draw.io VS Code extension, desktop app, or app.diagrams.net.
 
