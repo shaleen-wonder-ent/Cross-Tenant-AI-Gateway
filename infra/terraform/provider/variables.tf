@@ -82,6 +82,12 @@ variable "enable_foundry_private_endpoint" {
   default     = false
 }
 
+variable "apim_public_network_access_enabled" {
+  description = "Allow public network access to the APIM gateway. Set false to require the cross-tenant private endpoint."
+  type        = bool
+  default     = true
+}
+
 variable "foundry_public_network_access_enabled" {
   description = "Allow public network access to Foundry. Disable only after APIM outbound VNet integration is configured."
   type        = bool

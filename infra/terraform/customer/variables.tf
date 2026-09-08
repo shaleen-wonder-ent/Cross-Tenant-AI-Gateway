@@ -41,20 +41,27 @@ variable "model_invoke_app_role_id" {
 }
 
 variable "create_test_vm" {
-  description = "Create an SSH-only VM for validating private DNS and connectivity."
+  description = "Create an in-VNet VM that serves the demo web page and calls APIM privately."
   type        = bool
   default     = false
 }
 
-variable "admin_ssh_public_key" {
-  description = "SSH public key used when create_test_vm is true."
+variable "web_port" {
+  description = "TCP port the demo web app listens on."
+  type        = number
+  default     = 5000
+}
+
+variable "vm_size" {
+  description = "VM size for the demo web app. Choose a family with available quota in the subscription."
+  type        = string
+  default     = "Standard_B2s"
+}
+
+variable "allowed_client_ip" {
+  description = "Public IP allowed to reach SSH and the web app. Empty auto-detects the caller's IP."
   type        = string
   default     = ""
-
-  validation {
-    condition     = !var.create_test_vm || trimspace(var.admin_ssh_public_key) != ""
-    error_message = "admin_ssh_public_key is required when create_test_vm is true."
-  }
 }
 
 variable "tags" {

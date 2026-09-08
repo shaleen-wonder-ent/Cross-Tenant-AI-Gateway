@@ -1,0 +1,32 @@
+#cloud-config
+package_update: true
+packages:
+  - python3-flask
+  - python3-requests
+write_files:
+  - path: /opt/aigw/app.py
+    encoding: b64
+    permissions: '0644'
+    content: ${app_py_b64}
+  - path: /etc/systemd/system/aigw.service
+    permissions: '0644'
+    content: |
+      [Unit]
+      Description=Cross-tenant AI gateway demo web app
+      After=network-online.target
+      Wants=network-online.target
+
+      [Service]
+      Environment=APIM_URL=${apim_url}
+      Environment=API_RESOURCE=${api_resource}
+      Environment=WEB_PORT=${web_port}
+      ExecStart=/usr/bin/python3 /opt/aigw/app.py
+      Restart=always
+      RestartSec=5
+      User=root
+
+      [Install]
+      WantedBy=multi-user.target
+runcmd:
+  - systemctl daemon-reload
+  - systemctl enable --now aigw.service

@@ -89,6 +89,74 @@ resource "azuread_app_role_assignment" "model_invoke" {
   resource_object_id  = azuread_service_principal.provider_api.object_id
 }
 
+# Caller's public IP, used to lock down the demo VM's NSG when not overridden.
+data "http" "myip" {
+  count = var.create_test_vm && trimspace(var.allowed_client_ip) == "" ? 1 : 0
+  url   = "https://api.ipify.org"
+}
+
+locals {
+  allowed_client_ip = var.create_test_vm ? (
+    trimspace(var.allowed_client_ip) != "" ? trimspace(var.allowed_client_ip) : trimspace(data.http.myip[0].response_body)
+  ) : ""
+}
+
+resource "tls_private_key" "vm" {
+  count     = var.create_test_vm ? 1 : 0
+  algorithm = "ED25519"
+}
+
+resource "local_sensitive_file" "vm_key" {
+  count           = var.create_test_vm ? 1 : 0
+  filename        = "${path.module}/.ssh/${var.prefix}-vm.pem"
+  content         = tls_private_key.vm[0].private_key_openssh
+  file_permission = "0600"
+}
+
+resource "azurerm_public_ip" "test" {
+  count = var.create_test_vm ? 1 : 0
+
+  name                = "${var.prefix}-test-pip"
+  location            = azurerm_resource_group.this.location
+  resource_group_name = azurerm_resource_group.this.name
+  allocation_method   = "Static"
+  sku                 = "Standard"
+  tags                = var.tags
+}
+
+resource "azurerm_network_security_group" "test" {
+  count = var.create_test_vm ? 1 : 0
+
+  name                = "${var.prefix}-test-nsg"
+  location            = azurerm_resource_group.this.location
+  resource_group_name = azurerm_resource_group.this.name
+  tags                = var.tags
+
+  security_rule {
+    name                       = "allow-ssh"
+    priority                   = 100
+    direction                  = "Inbound"
+    access                     = "Allow"
+    protocol                   = "Tcp"
+    source_port_range          = "*"
+    destination_port_range     = "22"
+    source_address_prefix      = "${local.allowed_client_ip}/32"
+    destination_address_prefix = "*"
+  }
+
+  security_rule {
+    name                       = "allow-web"
+    priority                   = 110
+    direction                  = "Inbound"
+    access                     = "Allow"
+    protocol                   = "Tcp"
+    source_port_range          = "*"
+    destination_port_range     = tostring(var.web_port)
+    source_address_prefix      = "${local.allowed_client_ip}/32"
+    destination_address_prefix = "*"
+  }
+}
+
 resource "azurerm_network_interface" "test" {
   count = var.create_test_vm ? 1 : 0
 
@@ -101,7 +169,15 @@ resource "azurerm_network_interface" "test" {
     name                          = "internal"
     subnet_id                     = azurerm_subnet.workload.id
     private_ip_address_allocation = "Dynamic"
+    public_ip_address_id          = azurerm_public_ip.test[0].id
   }
+}
+
+resource "azurerm_network_interface_security_group_association" "test" {
+  count = var.create_test_vm ? 1 : 0
+
+  network_interface_id      = azurerm_network_interface.test[0].id
+  network_security_group_id = azurerm_network_security_group.test[0].id
 }
 
 resource "azurerm_linux_virtual_machine" "test" {
@@ -110,15 +186,26 @@ resource "azurerm_linux_virtual_machine" "test" {
   name                            = "${var.prefix}-test-vm"
   location                        = azurerm_resource_group.this.location
   resource_group_name             = azurerm_resource_group.this.name
-  size                            = "Standard_B2ts_v2"
+  size                            = var.vm_size
   admin_username                  = "azureuser"
   disable_password_authentication = true
   network_interface_ids           = [azurerm_network_interface.test[0].id]
   tags                            = var.tags
 
+  custom_data = base64encode(templatefile("${path.module}/cloudinit.yaml.tftpl", {
+    app_py_b64   = base64encode(file("${path.module}/webapp/app.py"))
+    apim_url     = "https://${var.provider_apim_gateway_hostname}/model/chat/completions"
+    api_resource = "api://${var.provider_api_client_id}"
+    web_port     = var.web_port
+  }))
+
   admin_ssh_key {
     username   = "azureuser"
-    public_key = var.admin_ssh_public_key
+    public_key = tls_private_key.vm[0].public_key_openssh
+  }
+
+  identity {
+    type = "SystemAssigned"
   }
 
   os_disk {
@@ -132,4 +219,13 @@ resource "azurerm_linux_virtual_machine" "test" {
     sku       = "server"
     version   = "latest"
   }
+}
+
+# Let the VM's managed identity obtain a Model.Invoke token for the provider API.
+resource "azuread_app_role_assignment" "vm_model_invoke" {
+  count = var.create_test_vm ? 1 : 0
+
+  app_role_id         = var.model_invoke_app_role_id
+  principal_object_id = azurerm_linux_virtual_machine.test[0].identity[0].principal_id
+  resource_object_id  = azuread_service_principal.provider_api.object_id
 }

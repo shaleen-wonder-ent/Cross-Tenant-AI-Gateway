@@ -159,6 +159,8 @@ resource "azurerm_api_management" "this" {
   sku_name            = "StandardV2_1"
   tags                = var.tags
 
+  public_network_access_enabled = var.apim_public_network_access_enabled
+
   identity {
     type = "SystemAssigned"
   }

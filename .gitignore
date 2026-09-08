@@ -11,6 +11,8 @@ crash.log
 crash.*.log
 *.tfvars
 !*.tfvars.example
+*.pem
+.ssh/
 override.tf
 override.tf.json
 *_override.tf
