@@ -82,6 +82,70 @@ Entra only stamps `Model.Invoke` into the token if that identity was **granted t
 
 ---
 
+## Who builds what — provider vs customer (say this on camera)
+
+The two sides never create objects in each other's tenant. They exchange **config values, not credentials**.
+
+| | **Provider** (in provider tenant) | **Customer** (in customer tenant) |
+|---|---|---|
+| Entra | **One multitenant app registration** (`aigw-prov-model-api`) that *defines* the audience `api://c3bacd9c...` and the `Model.Invoke` app role | The provider app *instantiated as an **enterprise app*** via consent + the **role assignment** to their caller identity |
+| Compute/network | APIM (private), Foundry + model, APIM managed identity + RBAC on Foundry, the inbound **policy** (customer tenant id + audience + role) | Their **caller workload** (VM/App Service/etc.) + its **managed identity**, VNet, **private endpoint** to APIM, private DNS |
+| Grants | *Defines* the `Model.Invoke` role — **does not assign it to anyone** | **Assigns** `Model.Invoke` to its own identity (this is the consent/grant) |
+| Shares outward | app (client) ID `c3bacd9c...`, role name/ID | its **tenant ID** (so the provider can put it in the policy) |
+
+### What our HCL created on each side
+- **Provider stage (`infra/terraform/provider`)** — `azuread_application` (multitenant) + identifier URI + app role, APIM, Foundry + `gpt-4o`, APIM system identity, RBAC `Cognitive Services OpenAI User`, and the inbound policy. **Nothing in the customer tenant.**
+- **Customer stage (`infra/terraform/customer`)** — `azuread_service_principal.provider_api` (instantiates the enterprise app = consent), the VM + its system-assigned identity, `azuread_app_role_assignment.vm_model_invoke` (the grant), VNet, private endpoint, private DNS. **Nothing in the provider tenant.**
+
+### The same thing done **manually** (what the provider asks the customer to do)
+
+**Provider does once (their tenant):**
+1. App registration `aigw-prov-model-api`, **multitenant**.
+2. **Expose an API** → Application ID URI `api://<appId>` (the audience).
+3. **App roles** → add `Model.Invoke` (member type **Applications**).
+4. Build APIM + Foundry; policy pins **customer tenant id + audience + role**; APIM identity gets **Cognitive Services OpenAI User** on Foundry.
+5. Hand the customer the **app ID** + **role**; ask for the customer's **tenant ID**.
+
+**Customer does (their tenant):**
+1. **Consent** to instantiate the enterprise app (admin-consent URL, run as customer admin):
+   `https://login.microsoftonline.com/<customer-tenant-id>/adminconsent?client_id=<provider-app-id>`
+   (CLI equivalent: `az ad sp create --id <provider-app-id>`)
+   > Do **not** use *Enterprise applications → Create your own application* — that makes a new, unrelated app with a different ID.
+2. **Turn on the caller's identity** (see options below) and copy its **principal (object) ID**.
+3. **Assign `Model.Invoke`** to that principal on the enterprise app (portal for users/groups; Graph/PowerShell for a managed identity/app):
+   ```powershell
+   $resourceSp = az ad sp show --id <provider-app-id> --query id -o tsv
+   $roleId     = "<Model.Invoke role id>"
+   $principal  = "<caller identity principal id>"
+   az rest --method post `
+     --url "https://graph.microsoft.com/v1.0/servicePrincipals/$resourceSp/appRoleAssignedTo" `
+     --body "{`"principalId`":`"$principal`",`"resourceId`":`"$resourceSp`",`"appRoleId`":`"$roleId`"}"
+   ```
+
+### Caller identity options (customer's choice — provider doesn't care)
+
+| Host | "Enable identity" | Token acquisition |
+|---|---|---|
+| **VM** (this demo) | Identity → **System assigned → On** | IMDS `resource=api://c3bacd9c...` |
+| **App Service / Functions** | Identity → **System assigned → On** | `DefaultAzureCredential` with scope `api://c3bacd9c.../.default` |
+| **AKS** | Workload identity federation | federated token, same scope |
+| **No MI / cross-cloud** | App registration + secret/cert/**federated credential** | client-credentials |
+
+- **System-assigned** = tied 1:1 to the resource; new principal on recreate (must re-grant). Simplest — used here.
+- **User-assigned** = standalone, **stable** principal, **grant once, share across many** VMs/App Services. Only code change: pass the identity's `client_id` to the credential. Extra manual steps: create the identity + attach it.
+
+### Scale / SaaS guidance
+- Many or autoscaled Azure workloads → **user-assigned managed identity** (grant `Model.Invoke` once, attach everywhere).
+- Compute outside Azure / cross-cloud → **app registration + federated credential**.
+- A SaaS is still **one customer tenant** to the provider (consents once). To bill/limit the SaaS's own end-customers, do it **in APIM** (subscription keys / quotas / a tenant claim) — not by minting a provider app per end-customer.
+
+### Does the provider need a separate policy per customer?
+No — only the **tenant ID** is per-customer. Either:
+- **Shared policy** that allow-lists multiple tenant IDs (check the `tid` claim; same audience + role), or
+- **Per-customer product/policy** when you want independent rate limits, revocation, metrics, or backends.
+
+---
+
 ## PART 1 — Customer tenant (sign in as `shaleenthapa@demoshaleet.onmicrosoft.com`)
 
 ### 1. Show the working demo
