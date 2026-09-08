@@ -1,0 +1,27 @@
+<policies>
+    <inbound>
+        <base />
+        <validate-azure-ad-token tenant-id="${customer_tenant_id}">
+            <audiences>
+                <audience>${api_audience}</audience>
+            </audiences>
+            <required-claims>
+                <claim name="roles" match="any">
+                    <value>${role_value}</value>
+                </claim>
+            </required-claims>
+        </validate-azure-ad-token>
+        <authentication-managed-identity resource="https://cognitiveservices.azure.com" />
+        <set-backend-service base-url="${foundry_openai_url}" />
+        <rewrite-uri template="/chat/completions?api-version=${api_version}" />
+    </inbound>
+    <backend>
+        <base />
+    </backend>
+    <outbound>
+        <base />
+    </outbound>
+    <on-error>
+        <base />
+    </on-error>
+</policies>

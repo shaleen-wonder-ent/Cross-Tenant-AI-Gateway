@@ -6,6 +6,10 @@
 
 **[docs/first-call-guide.md](docs/first-call-guide.md)** — the two implementation paths (OAuth2 client-credentials vs. subscription key), what to know about each, the networking approach, and the constraints to plan for.
 
+## Infrastructure as Code
+
+**[infra/terraform/README.md](infra/terraform/README.md)** — collaboration-ready Terraform for the provider and customer tenants, including the cross-tenant Private Link approval workflow.
+
 ## Detailed networking guides
 
 | Option | Guide | What it covers |
