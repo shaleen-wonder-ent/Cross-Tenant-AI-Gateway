@@ -1,6 +1,11 @@
 # Local, not-for-repo POC infrastructure (kept on local machine only)
 poc-terraform/
 
+# Local-only demo/recording artifacts (not for the repo)
+recording-steps.md
+diagrams/03-detailed-architecture.drawio
+diagrams/04-call-flow.drawio
+
 # Terraform (belt-and-suspenders in case files move outside poc-terraform/)
 **/.terraform/*
 *.tfstate
