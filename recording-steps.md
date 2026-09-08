@@ -93,11 +93,7 @@ The two sides never create objects in each other's tenant. They exchange **confi
 | Grants | *Defines* the `Model.Invoke` role — **does not assign it to anyone** | **Assigns** `Model.Invoke` to its own identity (this is the consent/grant) |
 | Shares outward | app (client) ID `c3bacd9c...`, role name/ID | its **tenant ID** (so the provider can put it in the policy) |
 
-### What our HCL created on each side
-- **Provider stage (`infra/terraform/provider`)** — `azuread_application` (multitenant) + identifier URI + app role, APIM, Foundry + `gpt-4o`, APIM system identity, RBAC `Cognitive Services OpenAI User`, and the inbound policy. **Nothing in the customer tenant.**
-- **Customer stage (`infra/terraform/customer`)** — `azuread_service_principal.provider_api` (instantiates the enterprise app = consent), the VM + its system-assigned identity, `azuread_app_role_assignment.vm_model_invoke` (the grant), VNet, private endpoint, private DNS. **Nothing in the provider tenant.**
-
-### The same thing done **manually** (what the provider asks the customer to do)
+### Step-by-step setup (what the provider asks the customer to do)
 
 **Provider does once (their tenant):**
 1. App registration `aigw-prov-model-api`, **multitenant**.
