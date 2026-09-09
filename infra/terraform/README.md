@@ -5,8 +5,8 @@ Link architecture. The deployment is split at the tenant ownership boundary:
 
 | Root | Owner | Resources |
 |---|---|---|
-| `provider/` | Platform provider | Microsoft Foundry model, APIM, provider VNet, managed identity RBAC, multitenant API registration |
-| `customer/` | Customer | Customer VNet, cross-tenant APIM private endpoint, private DNS, client registration, app-role consent |
+| `provider/` | Platform provider | Anthropic Claude (Haiku 4.5) deployment on Microsoft Foundry (private endpoint), APIM with outbound VNet integration, provider VNet, managed identity RBAC, multitenant API registration |
+| `customer/` | Customer | Customer VNet, cross-tenant APIM private endpoint, private DNS, client registration, app-role consent, optional test VM |
 
 No tenant IDs, subscription IDs, credentials, plans, or state files are
 committed. Each collaborator creates a local `terraform.tfvars` from the
@@ -21,6 +21,9 @@ the same root; backend configuration is intentionally environment-specific.
 - Customer rights to create Azure resources, service principals, and grant
   application consent
 - Model quota for the selected model, SKU, capacity, and region
+- For Anthropic Claude models, the Azure Marketplace offer terms are accepted
+  automatically via the deployment's `modelProviderData` (organization, country,
+  industry); set those variables to match your organization
 
 ## 1. Deploy the provider root
 
@@ -85,22 +88,46 @@ through your organization's approved secret-management process.
 
 ## Optional test VM
 
-Set `create_test_vm = true` and provide `admin_ssh_public_key` in the customer
-variables to create a private, SSH-key-only VM. It has no public IP. Use Azure
-Run Command to verify that the APIM hostname resolves to the private endpoint:
+Set `create_test_vm = true` in the customer variables to create a small VM that
+serves a demo web page and calls APIM privately using its managed identity. The
+VM generates its own SSH key (written under `customer/.ssh/`) and gets a public
+IP locked by NSG to your caller IP for browser/SSH access; the call to APIM
+still flows over the private endpoint. Terraform outputs `web_url`,
+`test_vm_ssh_command`, and `test_vm_public_ip`.
 
-```powershell
-az vm run-command invoke `
-  --resource-group <customer-resource-group> `
-  --name <test-vm-name> `
-  --command-id RunShellScript `
-  --scripts "getent hosts <provider-apim-hostname>"
-```
+The web app speaks Claude's native Messages API (`/model/v1/messages`) and
+sends the deployment name from `model_deployment_name`.
 
-## Optional private APIM-to-Foundry path
+## Model deployment (Claude via azapi)
 
-The provider root can create the Foundry private endpoint and DNS zones by
-setting `enable_foundry_private_endpoint = true`. APIM Standard v2 outbound
-VNet integration must also be configured before setting
-`foundry_public_network_access_enabled = false`; otherwise APIM cannot reach
-the model endpoint.
+The Claude deployment is created with `azapi` because the Anthropic Marketplace
+fields (`modelProviderData`) and API version `2025-10-01-preview` are not yet
+exposed by `azurerm_cognitive_deployment`. Key variables:
+
+- `model_name` / `model_deployment_name` — e.g. `claude-haiku-4-5`
+- `model_format` — `Anthropic`
+- `model_version` — the Hosted-on-Azure catalog version (e.g. `2`)
+- `model_sku_name` / `model_capacity` — e.g. `GlobalStandard`, capacity in kTPM
+- `model_org_name` / `model_country_code` / `model_industry` — Marketplace terms
+
+APIM exposes the native Claude Messages contract at `/model/v1/messages`. The
+inbound policy validates the customer JWT, obtains an APIM managed-identity
+token for `https://ai.azure.com`, adds the `anthropic-version` header, and
+forwards to the Foundry `/anthropic/v1/messages` backend.
+
+## Private APIM-to-Foundry path
+
+This configuration deploys Foundry privately by default:
+`enable_foundry_private_endpoint = true` and
+`foundry_public_network_access_enabled = false`. APIM Standard v2 reaches the
+Foundry private endpoint through outbound VNet integration
+(`virtual_network_type = "External"` on a delegated subnet that requires an
+associated NSG).
+
+APIM Standard v2 cannot be created with public access already blocked. Deploy
+in two phases:
+
+1. Apply the provider root with `apim_public_network_access_enabled = true`.
+2. After the customer private endpoint is approved (above), set
+   `apim_public_network_access_enabled = false` and re-apply. The APIM
+   privatization update takes a few minutes.
