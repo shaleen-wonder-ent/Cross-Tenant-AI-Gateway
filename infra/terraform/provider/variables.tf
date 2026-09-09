@@ -83,6 +83,24 @@ variable "anthropic_version" {
   default     = "2023-06-01"
 }
 
+variable "model_industry" {
+  description = "Industry for the required Anthropic model provider data."
+  type        = string
+  default     = "Technology"
+}
+
+variable "model_org_name" {
+  description = "Organization name for the required Anthropic model provider data."
+  type        = string
+  default     = "AI Gateway POC"
+}
+
+variable "model_country_code" {
+  description = "ISO country code for the required Anthropic model provider data."
+  type        = string
+  default     = "US"
+}
+
 variable "app_role_value" {
   description = "Application role required by the APIM policy."
   type        = string

@@ -42,6 +42,19 @@ resource "azurerm_subnet" "apim_integration" {
   }
 }
 
+# APIM StandardV2 VNet integration requires an NSG on the delegated subnet.
+resource "azurerm_network_security_group" "apim" {
+  name                = "${var.prefix}-apim-nsg"
+  location            = azurerm_resource_group.this.location
+  resource_group_name = azurerm_resource_group.this.name
+  tags                = var.tags
+}
+
+resource "azurerm_subnet_network_security_group_association" "apim" {
+  subnet_id                 = azurerm_subnet.apim_integration.id
+  network_security_group_id = azurerm_network_security_group.apim.id
+}
+
 resource "azurerm_subnet" "private_endpoints" {
   name                 = "snet-private-endpoints"
   resource_group_name  = azurerm_resource_group.this.name
@@ -66,9 +79,11 @@ resource "azurerm_cognitive_account" "foundry" {
 }
 
 resource "azapi_resource" "model" {
-  type      = "Microsoft.CognitiveServices/accounts/deployments@2024-10-01"
+  type      = "Microsoft.CognitiveServices/accounts/deployments@2025-10-01-preview"
   name      = var.model_deployment_name
   parent_id = azurerm_cognitive_account.foundry.id
+
+  schema_validation_enabled = false # required to allow modelProviderData
 
   body = {
     sku = {
@@ -81,10 +96,16 @@ resource "azapi_resource" "model" {
         name    = var.model_name
         version = var.model_version
       }
+      # Required for Anthropic Marketplace model deployments.
+      modelProviderData = {
+        organizationName = var.model_org_name
+        countryCode      = var.model_country_code
+        industry         = var.model_industry
+      }
+      versionUpgradeOption = "OnceNewDefaultVersionAvailable"
+      raiPolicyName        = "Microsoft.DefaultV2"
     }
   }
-
-  schema_validation_enabled = false
 }
 
 resource "azurerm_private_dns_zone" "foundry" {
@@ -176,6 +197,8 @@ resource "azurerm_api_management" "this" {
   identity {
     type = "SystemAssigned"
   }
+
+  depends_on = [azurerm_subnet_network_security_group_association.apim]
 }
 
 resource "azurerm_role_assignment" "apim_foundry" {
