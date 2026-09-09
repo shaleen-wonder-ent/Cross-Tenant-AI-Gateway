@@ -1,73 +1,73 @@
 <mxfile host="65bd71144e">
     <diagram id="two-options-call-flow" name="Two Options Call Flow">
-        <mxGraphModel dx="1356" dy="775" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1200" pageHeight="760" math="0" shadow="0">
+        <mxGraphModel dx="3174" dy="1282" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1200" pageHeight="760" math="0" shadow="0">
             <root>
                 <mxCell id="0"/>
                 <mxCell id="1" parent="0"/>
-                <mxCell id="title" parent="1" style="text;html=1;align=center;verticalAlign=middle;fontSize=15;fontStyle=1;fillColor=none;strokeColor=none;" value="Two Front-Door Options - Same Gateway, Same Back Door" vertex="1">
+                <mxCell id="title" parent="1" style="text;html=1;align=center;verticalAlign=middle;fontSize=15;fontStyle=1;fillColor=none;strokeColor=none;convertToSvg=1;" value="Two Front-Door Options - Same Gateway, Same Back Door" vertex="1">
                     <mxGeometry height="28" width="1160" as="geometry"/>
                 </mxCell>
-                <mxCell id="subtitle" parent="1" style="text;html=1;align=center;verticalAlign=middle;fontSize=11;fontStyle=2;fontColor=#666666;fillColor=none;strokeColor=none;" value="Only the front-door credential differs between Option 1 and Option 2 - everything from the gateway onward is identical" vertex="1">
+                <mxCell id="subtitle" parent="1" style="text;html=1;align=center;verticalAlign=middle;fontSize=11;fontStyle=2;fontColor=#666666;fillColor=none;strokeColor=none;convertToSvg=1;" value="Only the front-door credential differs between Option 1 and Option 2 - everything from the gateway onward is identical" vertex="1">
                     <mxGeometry height="20" width="1160" y="26" as="geometry"/>
                 </mxCell>
-                <mxCell id="colA_hdr" parent="1" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;fontStyle=1;fontSize=12;" value="CUSTOMER TENANT" vertex="1">
+                <mxCell id="colA_hdr" parent="1" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;fontStyle=1;fontSize=12;convertToSvg=1;svgWhiteSpace=wrap;" value="CUSTOMER TENANT" vertex="1">
                     <mxGeometry height="30" width="340" x="40" y="60" as="geometry"/>
                 </mxCell>
-                <mxCell id="colB_hdr" parent="1" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#f5f5f5;strokeColor=#666666;fontStyle=1;fontSize=12;" value="CROSS-TENANT BOUNDARY - CHOOSE ONE OPTION" vertex="1">
+                <mxCell id="colB_hdr" parent="1" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#f5f5f5;strokeColor=#666666;fontStyle=1;fontSize=12;convertToSvg=1;svgWhiteSpace=wrap;" value="CROSS-TENANT BOUNDARY - CHOOSE ONE OPTION" vertex="1">
                     <mxGeometry height="30" width="320" x="420" y="60" as="geometry"/>
                 </mxCell>
-                <mxCell id="colC_hdr" parent="1" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;fontStyle=1;fontSize=12;" value="PROVIDER TENANT" vertex="1">
+                <mxCell id="colC_hdr" parent="1" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;fontStyle=1;fontSize=12;convertToSvg=1;svgWhiteSpace=wrap;" value="PROVIDER TENANT" vertex="1">
                     <mxGeometry height="30" width="360" x="780" y="60" as="geometry"/>
                 </mxCell>
-                <mxCell id="user" parent="1" style="rounded=1;whiteSpace=wrap;html=1;align=left;verticalAlign=top;spacing=6;fontSize=10;fillColor=#ffffff;strokeColor=#6c8ebf;fontStyle=1" value="End User&lt;br&gt;Signs in with the CUSTOMER&#39;s own Entra ID" vertex="1">
+                <mxCell id="user" parent="1" style="rounded=1;whiteSpace=wrap;html=1;align=left;verticalAlign=top;spacing=6;fontSize=10;fillColor=#ffffff;strokeColor=#6c8ebf;fontStyle=1;convertToSvg=1;svgWhiteSpace=wrap;" value="End User&lt;br&gt;Signs in with the CUSTOMER&#39;s own Entra ID" vertex="1">
                     <mxGeometry height="70" width="340" x="40" y="110" as="geometry"/>
                 </mxCell>
-                <mxCell id="isv" parent="1" style="rounded=1;whiteSpace=wrap;html=1;align=left;verticalAlign=top;spacing=6;fontSize=10;fillColor=#ffffff;strokeColor=#6c8ebf;fontStyle=1" value="Customer Application (AI Force App)&lt;br&gt;Holds EITHER an OAuth2 client credential OR an APIM subscription key - never a raw Foundry/Anthropic key" vertex="1">
+                <mxCell id="isv" parent="1" style="rounded=1;whiteSpace=wrap;html=1;align=left;verticalAlign=top;spacing=6;fontSize=10;fillColor=#ffffff;strokeColor=#6c8ebf;fontStyle=1;convertToSvg=1;svgWhiteSpace=wrap;" value="Customer Application (AI Force App)&lt;br&gt;Holds EITHER an OAuth2 client credential OR an APIM subscription key - never a raw Foundry/Anthropic key" vertex="1">
                     <mxGeometry height="90" width="340" x="40" y="210" as="geometry"/>
                 </mxCell>
-                <mxCell id="option1" parent="1" style="rounded=1;whiteSpace=wrap;html=1;align=left;verticalAlign=top;spacing=6;fontSize=10;fillColor=#dae8fc;strokeColor=#1a73e8;strokeWidth=2;fontStyle=1" value="OPTION 1: OAuth2 client-credentials&lt;div&gt;&lt;font color=&quot;#000000&quot;&gt;&lt;br&gt;&lt;/font&gt;Customer Application gets a Bearer JWT from the CUSTOMER&#39;s Entra ID (client_credentials grant), presents it to APIM. validate-jwt checks issuer/audience/claims.&lt;/div&gt;" vertex="1">
+                <mxCell id="option1" parent="1" style="rounded=1;whiteSpace=wrap;html=1;align=left;verticalAlign=top;spacing=6;fontSize=10;fillColor=#dae8fc;strokeColor=#1a73e8;strokeWidth=2;fontStyle=1;convertToSvg=1;svgWhiteSpace=wrap;" value="OPTION 1: OAuth2 client-credentials&lt;div&gt;&lt;font color=&quot;#000000&quot;&gt;&lt;br&gt;&lt;/font&gt;Customer Application gets a Bearer JWT from the CUSTOMER&#39;s Entra ID (client_credentials grant), presents it to APIM. validate-jwt checks issuer/audience/claims.&lt;/div&gt;" vertex="1">
                     <mxGeometry height="100" width="320" x="420" y="150" as="geometry"/>
                 </mxCell>
-                <mxCell id="option2" parent="1" style="rounded=1;whiteSpace=wrap;html=1;align=left;verticalAlign=top;spacing=6;fontSize=10;fillColor=#e0f7fa;strokeColor=#00838f;strokeWidth=2;fontStyle=1" value="OPTION 2: APIM Subscription Key&lt;div&gt;&lt;font color=&quot;#000000&quot;&gt;&lt;br&gt;&lt;/font&gt;Customer Application sends an Ocp-Apim-Subscription-Key header. APIM validates the key against the client&#39;s product/subscription.&lt;/div&gt;" vertex="1">
+                <mxCell id="option2" parent="1" style="rounded=1;whiteSpace=wrap;html=1;align=left;verticalAlign=top;spacing=6;fontSize=10;fillColor=#e0f7fa;strokeColor=#00838f;strokeWidth=2;fontStyle=1;convertToSvg=1;svgWhiteSpace=wrap;" value="OPTION 2: APIM Subscription Key&lt;div&gt;&lt;font color=&quot;#000000&quot;&gt;&lt;br&gt;&lt;/font&gt;Customer Application sends an Ocp-Apim-Subscription-Key header. APIM validates the key against the client&#39;s product/subscription.&lt;/div&gt;" vertex="1">
                     <mxGeometry height="100" width="320" x="420" y="270" as="geometry"/>
                 </mxCell>
-                <mxCell id="apim" parent="1" style="rounded=1;whiteSpace=wrap;html=1;align=left;verticalAlign=top;spacing=6;fontSize=10;fillColor=#ffffff;strokeColor=#82b366;fontStyle=1" value="Azure API Management (v2 tier)&lt;div&gt;&lt;font color=&quot;#000000&quot;&gt;&lt;br&gt;&lt;/font&gt;Either option authenticates the caller and resolves it to a per-client product for quota + metering&lt;/div&gt;" vertex="1">
+                <mxCell id="apim" parent="1" style="rounded=1;whiteSpace=wrap;html=1;align=left;verticalAlign=top;spacing=6;fontSize=10;fillColor=#ffffff;strokeColor=#82b366;fontStyle=1;convertToSvg=1;svgWhiteSpace=wrap;" value="Azure API Management (v2 tier)&lt;div&gt;&lt;font color=&quot;#000000&quot;&gt;&lt;br&gt;&lt;/font&gt;Either option authenticates the caller and resolves it to a per-client product for quota + metering&lt;/div&gt;" vertex="1">
                     <mxGeometry height="110" width="360" x="780" y="180" as="geometry"/>
                 </mxCell>
-                <mxCell id="mi" parent="1" style="rounded=1;whiteSpace=wrap;html=1;align=left;verticalAlign=top;spacing=6;fontSize=10;fillColor=#d5e8d4;strokeColor=#82b366;fontStyle=1" value="Managed identity to Foundry (SAME-TENANT hop) - identical regardless of Option 1 or Option 2" vertex="1">
+                <mxCell id="mi" parent="1" style="rounded=1;whiteSpace=wrap;html=1;align=left;verticalAlign=top;spacing=6;fontSize=10;fillColor=#d5e8d4;strokeColor=#82b366;fontStyle=1;convertToSvg=1;svgWhiteSpace=wrap;" value="Managed identity to Foundry (SAME-TENANT hop) - identical regardless of Option 1 or Option 2" vertex="1">
                     <mxGeometry height="90" width="360" x="780" y="310" as="geometry"/>
                 </mxCell>
-                <mxCell id="foundry" parent="1" style="rounded=1;whiteSpace=wrap;html=1;align=left;verticalAlign=top;spacing=6;fontSize=10;fillColor=#ffffff;strokeColor=#82b366;fontStyle=1" value="Microsoft Foundry - Claude deployment" vertex="1">
+                <mxCell id="foundry" parent="1" style="rounded=1;whiteSpace=wrap;html=1;align=left;verticalAlign=top;spacing=6;fontSize=10;fillColor=#ffffff;strokeColor=#82b366;fontStyle=1;convertToSvg=1;svgWhiteSpace=wrap;" value="Microsoft Foundry - Claude deployment" vertex="1">
                     <mxGeometry height="70" width="360" x="780" y="420" as="geometry"/>
                 </mxCell>
-                <mxCell id="anthropic" parent="1" style="rounded=1;whiteSpace=wrap;html=1;align=left;verticalAlign=top;spacing=6;fontSize=10;fillColor=#ffe6cc;strokeColor=#d79b00;fontStyle=1" value="Anthropic-operated inference" vertex="1">
+                <mxCell id="anthropic" parent="1" style="rounded=1;whiteSpace=wrap;html=1;align=left;verticalAlign=top;spacing=6;fontSize=10;fillColor=#ffe6cc;strokeColor=#d79b00;fontStyle=1;convertToSvg=1;svgWhiteSpace=wrap;" value="Anthropic-operated inference" vertex="1">
                     <mxGeometry height="60" width="360" x="780" y="510" as="geometry"/>
                 </mxCell>
-                <mxCell id="e_user_isv" edge="1" parent="1" source="user" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;endArrow=block;strokeColor=#6c8ebf;exitX=0.5;exitY=1;entryX=0.5;entryY=0;" target="isv">
+                <mxCell id="e_user_isv" edge="1" parent="1" source="user" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;endArrow=block;strokeColor=#6c8ebf;exitX=0.5;exitY=1;entryX=0.5;entryY=0;convertToSvg=1;" target="isv">
                     <mxGeometry relative="1" as="geometry"/>
                 </mxCell>
-                <mxCell id="e_isv_opt1" edge="1" parent="1" source="isv" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;endArrow=block;strokeColor=#1a73e8;strokeWidth=2;fontColor=#ffffff;labelBackgroundColor=#1a73e8;fontStyle=1;exitX=1;exitY=0.3;entryX=0;entryY=0.5;" target="option1" value="1a">
+                <mxCell id="e_isv_opt1" edge="1" parent="1" source="isv" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;endArrow=block;strokeColor=#1a73e8;strokeWidth=2;fontColor=#ffffff;labelBackgroundColor=#1a73e8;fontStyle=1;exitX=1;exitY=0.3;entryX=0;entryY=0.5;convertToSvg=1;" target="option1" value="1a">
                     <mxGeometry relative="1" as="geometry"/>
                 </mxCell>
-                <mxCell id="e_isv_opt2" edge="1" parent="1" source="isv" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;endArrow=block;dashed=1;strokeColor=#00838f;strokeWidth=2;fontColor=#ffffff;labelBackgroundColor=#00838f;fontStyle=1;exitX=1;exitY=0.8;entryX=0;entryY=0.5;" target="option2" value="1b">
+                <mxCell id="e_isv_opt2" edge="1" parent="1" source="isv" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;endArrow=block;dashed=1;strokeColor=#00838f;strokeWidth=2;fontColor=#ffffff;labelBackgroundColor=#00838f;fontStyle=1;exitX=1;exitY=0.8;entryX=0;entryY=0.5;convertToSvg=1;" target="option2" value="1b">
                     <mxGeometry relative="1" as="geometry"/>
                 </mxCell>
-                <mxCell id="e_opt1_apim" edge="1" parent="1" source="option1" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;endArrow=block;strokeColor=#1a73e8;strokeWidth=2;exitX=1;exitY=0.3;entryX=0;entryY=0.3;" target="apim">
+                <mxCell id="e_opt1_apim" edge="1" parent="1" source="option1" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;endArrow=block;strokeColor=#1a73e8;strokeWidth=2;exitX=1;exitY=0.3;entryX=0;entryY=0.3;convertToSvg=1;" target="apim">
                     <mxGeometry relative="1" as="geometry"/>
                 </mxCell>
-                <mxCell id="e_opt2_apim" edge="1" parent="1" source="option2" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;endArrow=block;dashed=1;strokeColor=#00838f;strokeWidth=2;exitX=1;exitY=0.7;entryX=0;entryY=0.7;" target="apim">
+                <mxCell id="e_opt2_apim" edge="1" parent="1" source="option2" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;endArrow=block;dashed=1;strokeColor=#00838f;strokeWidth=2;exitX=1;exitY=0.7;entryX=0;entryY=0.7;convertToSvg=1;" target="apim">
                     <mxGeometry relative="1" as="geometry"/>
                 </mxCell>
-                <mxCell id="e_apim_mi" edge="1" parent="1" source="apim" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;endArrow=block;strokeColor=#82b366;exitX=0.5;exitY=1;entryX=0.5;entryY=0;" target="mi">
+                <mxCell id="e_apim_mi" edge="1" parent="1" source="apim" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;endArrow=block;strokeColor=#82b366;exitX=0.5;exitY=1;entryX=0.5;entryY=0;convertToSvg=1;" target="mi">
                     <mxGeometry relative="1" as="geometry"/>
                 </mxCell>
-                <mxCell id="e_mi_foundry" edge="1" parent="1" source="mi" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;endArrow=block;strokeColor=#82b366;exitX=0.5;exitY=1;entryX=0.5;entryY=0;" target="foundry">
+                <mxCell id="e_mi_foundry" edge="1" parent="1" source="mi" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;endArrow=block;strokeColor=#82b366;exitX=0.5;exitY=1;entryX=0.5;entryY=0;convertToSvg=1;" target="foundry">
                     <mxGeometry relative="1" as="geometry"/>
                 </mxCell>
-                <mxCell id="e_foundry_anthropic" edge="1" parent="1" source="foundry" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;endArrow=block;strokeColor=#d79b00;exitX=0.5;exitY=1;entryX=0.5;entryY=0;" target="anthropic">
+                <mxCell id="e_foundry_anthropic" edge="1" parent="1" source="foundry" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;endArrow=block;strokeColor=#d79b00;exitX=0.5;exitY=1;entryX=0.5;entryY=0;convertToSvg=1;" target="anthropic">
                     <mxGeometry relative="1" as="geometry"/>
                 </mxCell>
-                <mxCell id="footer" parent="1" style="rounded=1;whiteSpace=wrap;html=1;align=center;verticalAlign=middle;spacing=6;fontSize=10;fontStyle=2;fillColor=#f5f5f5;strokeColor=#666666;" value="Both options terminate identity at the gateway. Only the front-door credential (Option 1 vs Option 2, shown above) differs - everything from APIM onward (managed identity to Foundry, Foundry&#39;s internal call to Anthropic) is identical regardless of choice. A client can start on Option 2 for a fast pilot and move to Option 1 later without changing anything past the front door." vertex="1">
+                <mxCell id="footer" parent="1" style="rounded=1;whiteSpace=wrap;html=1;align=center;verticalAlign=middle;spacing=6;fontSize=10;fontStyle=2;fillColor=#f5f5f5;strokeColor=#666666;convertToSvg=1;svgWhiteSpace=wrap;" value="Both options terminate identity at the gateway. Only the front-door credential (Option 1 vs Option 2, shown above) differs - everything from APIM onward (managed identity to Foundry, Foundry&#39;s internal call to Anthropic) is identical regardless of choice. A client can start on Option 2 for a fast pilot and move to Option 1 later without changing anything past the front door." vertex="1">
                     <mxGeometry height="80" width="1100" x="40" y="600" as="geometry"/>
                 </mxCell>
             </root>
