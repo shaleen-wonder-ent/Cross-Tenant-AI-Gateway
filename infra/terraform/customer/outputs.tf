@@ -9,8 +9,8 @@ output "apim_private_endpoint_ip" {
 }
 
 output "chat_url" {
-  description = "Private APIM chat completions URL."
-  value       = "https://${var.provider_apim_gateway_hostname}/model/chat/completions"
+  description = "Private APIM Claude Messages URL."
+  value       = "https://${var.provider_apim_gateway_hostname}/model/v1/messages"
 }
 
 output "test_vm_name" {

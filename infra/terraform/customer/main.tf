@@ -194,8 +194,9 @@ resource "azurerm_linux_virtual_machine" "test" {
 
   custom_data = base64encode(templatefile("${path.module}/cloudinit.yaml.tftpl", {
     app_py_b64   = base64encode(file("${path.module}/webapp/app.py"))
-    apim_url     = "https://${var.provider_apim_gateway_hostname}/model/chat/completions"
+    apim_url     = "https://${var.provider_apim_gateway_hostname}/model/v1/messages"
     api_resource = "api://${var.provider_api_client_id}"
+    model_name   = var.model_deployment_name
     web_port     = var.web_port
   }))
 

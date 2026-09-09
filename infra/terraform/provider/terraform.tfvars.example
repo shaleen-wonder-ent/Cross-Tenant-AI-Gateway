@@ -7,6 +7,20 @@ publisher_email     = "platform@example.com"
 location = "eastus2"
 prefix   = "aigw-prov"
 
+# Require the cross-tenant private endpoint; block public gateway access.
+apim_public_network_access_enabled = false
+
+# Private Foundry: private endpoint + APIM outbound VNet integration.
+enable_foundry_private_endpoint       = true
+foundry_public_network_access_enabled = false
+
+# Claude Haiku 4.5 on Foundry (Hosted on Azure). Confirm model_version in the catalog.
+model_name            = "claude-haiku-4-5"
+model_deployment_name = "claude-haiku-4-5"
+model_format          = "Anthropic"
+model_version         = "1"
+model_sku_name        = "GlobalStandard"
+
 tags = {
   environment = "poc"
   workload    = "cross-tenant-ai-gateway"

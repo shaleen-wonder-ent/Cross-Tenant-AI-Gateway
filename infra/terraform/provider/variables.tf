@@ -36,15 +36,28 @@ variable "publisher_email" {
 }
 
 variable "model_name" {
-  description = "Foundry model name and deployment name."
+  description = "Foundry catalog model ID to deploy."
   type        = string
-  default     = "gpt-4o"
+  default     = "claude-haiku-4-5"
+}
+
+variable "model_deployment_name" {
+  description = "Deployment name callers pass in the Claude `model` field."
+  type        = string
+  default     = "claude-haiku-4-5"
+}
+
+variable "model_format" {
+  description = "Model publisher/format in the Foundry catalog."
+  type        = string
+  default     = "Anthropic"
 }
 
 variable "model_version" {
-  description = "Foundry model version available in the selected region."
+  # Confirm the exact Hosted-on-Azure version in the Foundry catalog before applying.
+  description = "Foundry model version for the selected hosting option."
   type        = string
-  default     = "2024-11-20"
+  default     = "1"
 }
 
 variable "model_sku_name" {
@@ -64,10 +77,10 @@ variable "model_capacity" {
   }
 }
 
-variable "openai_api_version" {
-  description = "API version APIM passes to the Foundry model endpoint."
+variable "anthropic_version" {
+  description = "anthropic-version header APIM sends to the Claude Messages API."
   type        = string
-  default     = "2024-10-21"
+  default     = "2023-06-01"
 }
 
 variable "app_role_value" {
@@ -79,7 +92,7 @@ variable "app_role_value" {
 variable "enable_foundry_private_endpoint" {
   description = "Create a private endpoint and private DNS zones for Foundry."
   type        = bool
-  default     = false
+  default     = true
 }
 
 variable "apim_public_network_access_enabled" {
@@ -89,9 +102,9 @@ variable "apim_public_network_access_enabled" {
 }
 
 variable "foundry_public_network_access_enabled" {
-  description = "Allow public network access to Foundry. Disable only after APIM outbound VNet integration is configured."
+  description = "Allow public network access to Foundry. Requires APIM outbound VNet integration when false."
   type        = bool
-  default     = true
+  default     = false
 }
 
 variable "tags" {

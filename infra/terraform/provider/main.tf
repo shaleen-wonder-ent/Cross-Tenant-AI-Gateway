@@ -65,20 +65,26 @@ resource "azurerm_cognitive_account" "foundry" {
   }
 }
 
-resource "azurerm_cognitive_deployment" "model" {
-  name                 = var.model_name
-  cognitive_account_id = azurerm_cognitive_account.foundry.id
+resource "azapi_resource" "model" {
+  type      = "Microsoft.CognitiveServices/accounts/deployments@2024-10-01"
+  name      = var.model_deployment_name
+  parent_id = azurerm_cognitive_account.foundry.id
 
-  model {
-    format  = "OpenAI"
-    name    = var.model_name
-    version = var.model_version
+  body = {
+    sku = {
+      name     = var.model_sku_name
+      capacity = var.model_capacity
+    }
+    properties = {
+      model = {
+        format  = var.model_format
+        name    = var.model_name
+        version = var.model_version
+      }
+    }
   }
 
-  sku {
-    name     = var.model_sku_name
-    capacity = var.model_capacity
-  }
+  schema_validation_enabled = false
 }
 
 resource "azurerm_private_dns_zone" "foundry" {
@@ -161,6 +167,12 @@ resource "azurerm_api_management" "this" {
 
   public_network_access_enabled = var.apim_public_network_access_enabled
 
+  # Outbound VNet integration so APIM reaches the Foundry private endpoint.
+  virtual_network_type = "External"
+  virtual_network_configuration {
+    subnet_id = azurerm_subnet.apim_integration.id
+  }
+
   identity {
     type = "SystemAssigned"
   }
@@ -168,7 +180,7 @@ resource "azurerm_api_management" "this" {
 
 resource "azurerm_role_assignment" "apim_foundry" {
   scope                = azurerm_cognitive_account.foundry.id
-  role_definition_name = "Cognitive Services OpenAI User"
+  role_definition_name = "Cognitive Services User"
   principal_id         = azurerm_api_management.this.identity[0].principal_id
 }
 
@@ -184,13 +196,13 @@ resource "azurerm_api_management_api" "model" {
 }
 
 resource "azurerm_api_management_api_operation" "chat" {
-  operation_id        = "chat-completions"
+  operation_id        = "messages"
   api_name            = azurerm_api_management_api.model.name
   api_management_name = azurerm_api_management.this.name
   resource_group_name = azurerm_resource_group.this.name
-  display_name        = "Chat Completions"
+  display_name        = "Messages"
   method              = "POST"
-  url_template        = "/chat/completions"
+  url_template        = "/v1/messages"
 
   response {
     status_code = 200
@@ -203,10 +215,10 @@ resource "azurerm_api_management_api_policy" "model" {
   resource_group_name = azurerm_resource_group.this.name
 
   xml_content = templatefile("${path.module}/policy.xml", {
-    api_audience       = "api://${azuread_application.provider_api.client_id}"
-    api_version        = var.openai_api_version
-    customer_tenant_id = var.customer_tenant_id
-    foundry_openai_url = "https://${azurerm_cognitive_account.foundry.custom_subdomain_name}.openai.azure.com/openai/deployments/${azurerm_cognitive_deployment.model.name}"
-    role_value         = var.app_role_value
+    api_audience          = "api://${azuread_application.provider_api.client_id}"
+    anthropic_version     = var.anthropic_version
+    customer_tenant_id    = var.customer_tenant_id
+    foundry_anthropic_url = "https://${azurerm_cognitive_account.foundry.custom_subdomain_name}.services.ai.azure.com/anthropic"
+    role_value            = var.app_role_value
   })
 }

@@ -24,11 +24,16 @@ output "provider_api_scope" {
 }
 
 output "chat_url" {
-  description = "APIM chat completions endpoint."
-  value       = "${azurerm_api_management.this.gateway_url}/model/chat/completions"
+  description = "APIM Claude Messages endpoint."
+  value       = "${azurerm_api_management.this.gateway_url}/model/v1/messages"
 }
 
 output "foundry_endpoint" {
   description = "Microsoft Foundry inference endpoint."
-  value       = "https://${azurerm_cognitive_account.foundry.custom_subdomain_name}.openai.azure.com"
+  value       = "https://${azurerm_cognitive_account.foundry.custom_subdomain_name}.services.ai.azure.com"
+}
+
+output "model_deployment_name" {
+  description = "Deployment name callers pass in the Claude `model` field."
+  value       = var.model_deployment_name
 }

@@ -19,6 +19,7 @@ write_files:
       [Service]
       Environment=APIM_URL=${apim_url}
       Environment=API_RESOURCE=${api_resource}
+      Environment=MODEL_NAME=${model_name}
       Environment=WEB_PORT=${web_port}
       ExecStart=/usr/bin/python3 /opt/aigw/app.py
       Restart=always

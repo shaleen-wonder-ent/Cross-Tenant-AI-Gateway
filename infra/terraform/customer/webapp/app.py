@@ -5,6 +5,7 @@ from flask import Flask, request, render_template_string
 
 APIM_URL = os.environ["APIM_URL"]
 API_RESOURCE = os.environ["API_RESOURCE"]
+MODEL_NAME = os.environ["MODEL_NAME"]
 WEB_PORT = int(os.environ.get("WEB_PORT", "5000"))
 
 app = Flask(__name__)
@@ -64,11 +65,19 @@ def index():
             resp = requests.post(
                 APIM_URL,
                 headers={"Authorization": f"Bearer {token}", "Content-Type": "application/json"},
-                json={"messages": [{"role": "user", "content": prompt}], "max_tokens": 400},
+                json={
+                    "model": MODEL_NAME,
+                    "max_tokens": 400,
+                    "messages": [{"role": "user", "content": prompt}],
+                },
                 timeout=60,
             )
             resp.raise_for_status()
-            answer = resp.json()["choices"][0]["message"]["content"]
+            answer = "".join(
+                block.get("text", "")
+                for block in resp.json().get("content", [])
+                if block.get("type") == "text"
+            )
         except requests.HTTPError as exc:
             error = f"{exc.response.status_code}: {exc.response.text}"
         except Exception as exc:  # noqa: BLE001 - surface any failure to the page

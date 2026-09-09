@@ -40,6 +40,12 @@ variable "model_invoke_app_role_id" {
   type        = string
 }
 
+variable "model_deployment_name" {
+  description = "Claude deployment name from the provider, sent in the request `model` field."
+  type        = string
+  default     = "claude-haiku-4-5"
+}
+
 variable "create_test_vm" {
   description = "Create an in-VNet VM that serves the demo web page and calls APIM privately."
   type        = bool
