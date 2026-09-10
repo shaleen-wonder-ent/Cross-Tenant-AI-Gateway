@@ -26,6 +26,55 @@ authorization and quotas, removes headers that callers must not control, and
 then obtains a new provider-tenant token for Foundry using its managed identity.
 Foundry never receives or needs to understand the customer's external identity.
 
+### Direct validation does not require identity federation
+
+When APIM validates the external IdP token directly, no directory federation or
+identity synchronization is required:
+
+- No federation between a customer Entra tenant and the provider Entra tenant.
+- No federation between the customer's third-party IdP and provider Entra.
+- No customer service principal or enterprise application in provider Entra.
+- No cross-tenant consent and no external-token exchange through provider Entra.
+
+There is still an explicit **trust configuration**, but it exists in the APIM
+gateway policy rather than as a federation relationship. The provider configures
+APIM with the approved OIDC issuer, discovery endpoint, API audience, permission,
+and workload identifier. APIM retrieves the IdP's public signing keys and accepts
+only tokens that satisfy that complete authorization profile.
+
+```mermaid
+flowchart LR
+  subgraph CIDP[Customer IdP]
+    TOKEN[Issues access token]
+    META[OIDC metadata]
+    KEYS[Public signing keys]
+  end
+
+  subgraph PT[Provider tenant]
+    subgraph APIM[APIM validates]
+      SIG[Signature and JWKS]
+      ISS[Issuer]
+      AUD[Audience]
+      EXP[Expiry]
+      PERM[Scope or role]
+      CLIENT[Client or subject identity]
+    end
+    MI[APIM managed identity]
+    FOUNDRY[Microsoft Foundry]
+
+    APIM --> MI --> FOUNDRY
+  end
+
+  TOKEN -- Bearer token --> APIM
+  APIM -. Reads metadata and public keys .-> META
+  META --- KEYS
+```
+
+After validation, APIM can map the validated issuer and workload claims to an
+internal customer record for quotas, rate limits, logging, and billing. This is
+an application-level authorization mapping inside APIM; it is not federation
+or identity mapping between the two identity systems.
+
 ## Recommended design: direct OIDC trust
 
 Use direct trust when the customer IdP can issue a signed OAuth 2.0 access token
