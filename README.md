@@ -6,6 +6,8 @@
 
 **[docs/first-call-guide.md](docs/first-call-guide.md)** — the two implementation paths (OAuth2 client-credentials vs. subscription key), what to know about each, the networking approach, and the constraints to plan for.
 
+**[docs/non-entra-customer-authentication.md](docs/non-entra-customer-authentication.md)** — production authentication options when the customer uses Okta, Ping, Auth0, Keycloak, Google, or another standards-compliant OIDC provider instead of Microsoft Entra ID.
+
 ## Infrastructure as Code
 
 **[infra/terraform/README.md](infra/terraform/README.md)** — collaboration-ready Terraform for the provider and customer tenants, including the cross-tenant Private Link approval workflow.

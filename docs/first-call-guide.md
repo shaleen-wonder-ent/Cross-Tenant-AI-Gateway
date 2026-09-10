@@ -32,6 +32,16 @@ Provider tenant:  multitenant provider API app registration + APIM + Microsoft F
 Customer tenant:  single-tenant customer client app registration + consented provider service principal
 ```
 
+### Customer uses a non-Entra identity provider
+
+Microsoft Entra ID is not required on the customer side. APIM can validate an
+OAuth 2.0 access token directly from a standards-compliant OIDC provider such as
+Okta, Ping, Auth0, Keycloak, or Google. The APIM-to-Foundry hop still uses the
+provider's managed identity and is unchanged. See the
+**[non-Entra customer authentication guide](non-entra-customer-authentication.md)**
+for the architecture, IdP requirements, APIM policy pattern, federation
+alternative, onboarding contract, and validation checklist.
+
 ## Path 1 — OAuth2 client-credentials
 
 Your app requests a short-lived access token from the provider's identity system (app-only, no end-user involved) and presents it to the gateway.
